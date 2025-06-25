@@ -1,67 +1,80 @@
-﻿using Dsw2025Tpi.Domain.Entities;
-using Dsw2025Tpi.Domain.Interfaces;
+﻿using Dsw2025Tpi.Domain.Common;
+using Dsw2025Tpi.Domain.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
-namespace Dsw2025Tpi.Data.Repositories;
-
-public class EfRepository: IRepository
+namespace Dsw2025Tpi.Data.Repositories
 {
-    private readonly Dsw2025TpiContext _context;
-
-    public EfRepository(Dsw2025TpiContext context)
+    public class EfRepository<T> : IRepository<T> where T : EntityBase
     {
-        _context = context;
-    }
+        protected readonly Dsw2025TpiContext _context;
 
-    public async Task<T> Add<T>(T entity) where T : EntityBase
-    {
-        await _context.AddAsync(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
-
-    public async Task<T> Delete<T>(T entity) where T : EntityBase
-    {
-        _context.Remove(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
-
-    public async Task<T?> First<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase
-    {
-        return await Include(_context.Set<T>(), include).FirstOrDefaultAsync(predicate);
-    }
-
-    public async Task<IEnumerable<T>?> GetAll<T>(params string[] include) where T : EntityBase
-    {
-        return await Include(_context.Set<T>(), include).ToListAsync();
-    }
-
-    public async Task<T?> GetById<T>(Guid id, params string[] include) where T : EntityBase
-    {
-        return await Include(_context.Set<T>(), include).FirstOrDefaultAsync(e => e.Id == id);
-    }
-
-    public async Task<IEnumerable<T>?> GetFiltered<T>(Expression<Func<T, bool>> predicate, params string[] include) where T : EntityBase
-    {
-        return await Include(_context.Set<T>(), include).Where(predicate).ToListAsync();
-    }
-
-    public async Task<T> Update<T>(T entity) where T : EntityBase
-    {
-        _context.Update(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
-
-    private static IQueryable<T> Include<T>(IQueryable<T> query, string[] includes) where T : EntityBase
-    {
-        var includedQuery = query;
-
-        foreach (var include in includes)
+        public EfRepository(Dsw2025TpiContext context)
         {
-            includedQuery = includedQuery.Include(include);
+            _context = context;
         }
-        return includedQuery;
+
+        public async Task<T?> GetById(Guid id, params string[] include)
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var navigation in include)
+                query = query.Include(navigation);
+
+            return await query.FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<IEnumerable<T>?> GetAll(params string[] include)
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var navigation in include)
+                query = query.Include(navigation);
+
+            var list = await query.ToListAsync();
+            return list.Count > 0 ? list : null;
+        }
+
+        public async Task<T?> First(Expression<Func<T, bool>> predicate, params string[] include)
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var navigation in include)
+                query = query.Include(navigation);
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<IEnumerable<T>?> GetFiltered(Expression<Func<T, bool>> predicate, params string[] include)
+        {
+            IQueryable<T> query = _context.Set<T>();
+            foreach (var navigation in include)
+                query = query.Include(navigation);
+
+            var list = await query.Where(predicate).ToListAsync();
+            return list.Count > 0 ? list : null;
+        }
+
+        public async Task<T> Add(T entity)
+        {
+            await _context.Set<T>().AddAsync(entity);
+            // No llamo a SaveChangesAsync aquí: el UnitOfWork se encarga de confirmar
+            return entity;
+        }
+
+        public async Task<T> Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            // No llamo a SaveChangesAsync aquí: el UnitOfWork se encarga de confirmar
+            return await Task.FromResult(entity);
+        }
+
+        public async Task<T> Delete(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+            // No llamo a SaveChangesAsync aquí: el UnitOfWork se encarga de confirmar
+            return await Task.FromResult(entity);
+        }
     }
 }
