@@ -1,4 +1,4 @@
-﻿namespace Dsw2025Tpi.Domain.Entities;
+﻿namespace Dsw2025Tpi.Domain.Common;
 
 public abstract class EntityBase
 {
