@@ -21,6 +21,7 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
@@ -35,8 +36,11 @@ public class Program
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
+
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddAutoMapper(typeof(Dsw2025Tpi.Application.Mappings.MappingProfiles));
+
 
 
 

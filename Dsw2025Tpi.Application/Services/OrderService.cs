@@ -22,7 +22,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<OrderResponse?> GetByIdAsync(Guid id)
         {
-            var order = await _unitOfWork.Orders.GetById(id, "OrderItems", "Customer");
+            var order = await _unitOfWork.Orders.GetById(id, "OrderItems.Product", "Customer");
             return order is null ? null : _mapper.Map<OrderResponse>(order);
         }
 
@@ -32,7 +32,7 @@ namespace Dsw2025Tpi.Application.Services
             int pageNumber = 1,
             int pageSize = 10)
         {
-            var orders = await _unitOfWork.Orders.GetAll("OrderItems", "Customer") ?? new List<Order>();
+            var orders = await _unitOfWork.Orders.GetAll("OrderItems.Product", "Customer") ?? new List<Order>();
 
             if (!string.IsNullOrEmpty(status))
                 orders = orders.Where(o => o.Status.ToString().Equals(status, StringComparison.OrdinalIgnoreCase));
@@ -97,7 +97,9 @@ namespace Dsw2025Tpi.Application.Services
             await _unitOfWork.SaveChangesAsync();
 
             // Mapear y retornar OrderResponse
-            return _mapper.Map<OrderResponse>(order);
+            var fullOrder = await _unitOfWork.Orders.GetById(order.Id, "OrderItems.Product", "Customer");
+            return _mapper.Map<OrderResponse>(fullOrder);
+
         }
 
         public async Task<OrderResponse?> UpdateStatusAsync(Guid orderId, string newStatus)

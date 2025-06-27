@@ -77,12 +77,17 @@ namespace Dsw2025Tpi.Application.Services
         public async Task DisableAsync(Guid productId)
         {
             var product = await _unitOfWork.Products.GetById(productId);
-            if (product is not null)
-            {
-                product.IsActive = false;
-                await _unitOfWork.Products.Update(product);
-                await _unitOfWork.SaveChangesAsync();
-            }
+
+            if (product is null)
+                throw new NotFoundException("Producto no encontrado.");
+
+            if (!product.IsActive)
+                throw new ApplicationException("El producto ya está inhabilitado.");
+
+            product.IsActive = false;
+            await _unitOfWork.Products.Update(product);
+            await _unitOfWork.SaveChangesAsync();
         }
+
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Dsw2025Tpi.Application.Exceptions;
+
 
 namespace Dsw2025Tpi.Api.Controllers;
 
@@ -49,10 +51,22 @@ public class ProductsController : ControllerBase
         return Ok(updated);
     }
 
-    [HttpDelete("{id}")]
+    [HttpPatch("{id}")]
     public async Task<IActionResult> Disable(Guid id)
     {
-        await _productService.DisableAsync(id);
-        return NoContent();
+        try
+        {
+            await _productService.DisableAsync(id);
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ApplicationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
+
 }
