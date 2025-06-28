@@ -14,7 +14,7 @@ namespace Dsw2025Tpi.Api.Controllers
         {
             _orderService = orderService;
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? status = null,

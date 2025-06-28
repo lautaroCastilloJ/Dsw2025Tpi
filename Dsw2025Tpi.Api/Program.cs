@@ -35,7 +35,6 @@ public class Program
         // Servicios de aplicación (los crearás en la siguiente capa)
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
-        builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
 
         builder.Services.AddFluentValidationAutoValidation();
