@@ -1,12 +1,13 @@
-using Dsw2025Tpi.Domain.Interfaces.Repositories;
+using Dsw2025Tpi.Api.Middlewares;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Application.Validators;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Dsw2025Tpi.Application.Validators;
-using FluentValidation.AspNetCore;
+using Dsw2025Tpi.Domain.Interfaces;
 using FluentValidation;
-using Dsw2025Tpi.Application.Services.Interfaces;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dsw2025Tpi.Api;
 
@@ -26,22 +27,14 @@ public class Program
         builder.Services.AddHealthChecks();
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-        // Repositorios y UnitOfWork
-        builder.Services.AddScoped<IProductRepository, ProductRepository>();
-        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        // Servicios de aplicación (los crearás en la siguiente capa)
+        builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
-        builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
-
+        builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<OrderItemRequestValidator>();
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddAutoMapper(typeof(Dsw2025Tpi.Application.Mappings.MappingProfiles));
-
-
 
 
         var app = builder.Build();
@@ -53,7 +46,7 @@ public class Program
             app.UseSwaggerUI();
         }
         
-        app.UseMiddleware<Dsw2025Tpi.Api.Middlewares.ExceptionMiddleware>();
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.UseHttpsRedirection();
 

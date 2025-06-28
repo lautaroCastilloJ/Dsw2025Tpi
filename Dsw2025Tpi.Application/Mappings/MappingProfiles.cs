@@ -15,17 +15,6 @@ public class MappingProfiles : Profile
 
         // Order
         CreateMap<Order, OrderResponse>();
-        CreateMap<OrderRequest, Order>();
-
-        // OrderItems
         CreateMap<OrderItem, OrderItemResponse>();
-        CreateMap<OrderItemRequest, OrderItem>();
-        
-        CreateMap<OrderItem, OrderItemResponse>()
-    .ForMember(dest => dest.ProductName,
-               opt => opt.MapFrom(src => src.Product.Name));
-
-
-        // (Agregá más según tus DTOs y entidades)
     }
 }

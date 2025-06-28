@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dsw2025Tpi.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Dsw2025Tpi.Domain.Entities;
 
 namespace Dsw2025Tpi.Data.Configurations;
 
@@ -14,15 +14,13 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.Property(c => c.Email)
             .IsRequired()
-            .HasMaxLength(200);
-
-        builder.HasIndex(c => c.Email).IsUnique();
+            .HasMaxLength(100);
 
         builder.Property(c => c.Name)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(100);
 
         builder.Property(c => c.PhoneNumber)
-            .HasMaxLength(30);
+            .HasMaxLength(20);
     }
 }

@@ -1,93 +1,72 @@
 ﻿using AutoMapper;
 using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Dtos.Responses;
-using Dsw2025Tpi.Application.Exceptions;
-using Dsw2025Tpi.Application.Services.Interfaces;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
-using Dsw2025Tpi.Domain.Interfaces.Repositories;
+using Dsw2025Tpi.Domain.Interfaces;
 
+namespace Dsw2025Tpi.Application.Services;
 
-namespace Dsw2025Tpi.Application.Services
+public class ProductService : IProductService
 {
-    public class ProductService : IProductService
+    private readonly IRepository<Product> _productRepository;
+    private readonly IMapper _mapper;
+
+    public ProductService(IRepository<Product> productRepository, IMapper mapper)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _productRepository = productRepository;
+        _mapper = mapper;
+    }
 
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+    public async Task<ProductResponse?> GetByIdAsync(Guid id)
+    {
+        var product = await _productRepository.GetById(id);
+        return product is null ? null : _mapper.Map<ProductResponse>(product);
+    }
 
-        public async Task<ProductResponse?> GetByIdAsync(Guid id)
-        {
-            var product = await _unitOfWork.Products.GetById(id);
-            return product is null ? null : _mapper.Map<ProductResponse>(product);
-        }
+    public async Task<IEnumerable<ProductResponse>> GetAllAsync()
+    {
+        var products = await _productRepository.GetAll();
+        return _mapper.Map<IEnumerable<ProductResponse>>(products);
+    }
 
-        public async Task<IEnumerable<ProductResponse>> GetAllAsync()
-        {
-            var products = await _unitOfWork.Products.GetAll() ?? new List<Product>();
-            return products.Select(p => _mapper.Map<ProductResponse>(p));
-        }
+    public async Task<ProductResponse> CreateAsync(ProductRequest request)
+    {
+        var product = Product.Create(
+            request.Sku,
+            request.InternalCode,
+            request.Name,
+            request.Description,
+            request.CurrentUnitPrice,
+            request.StockQuantity
+        );
 
-        public async Task<ProductResponse> CreateAsync(ProductRequest request)
-        {
-            // Validación de SKU único (regla de negocio)
-            var existing = await _unitOfWork.Products.First(p => p.Sku == request.Sku);
-            if (existing != null)
-                throw new ProductAlreadyExistsException(request.Sku);
+        await _productRepository.Add(product);
+        return _mapper.Map<ProductResponse>(product);
+    }
 
-            var product = _mapper.Map<Product>(request);
+    public async Task<ProductResponse?> UpdateAsync(Guid productId, ProductRequest request)
+    {
+        var existing = await _productRepository.GetById(productId);
+        if (existing is null) return null;
 
-            await _unitOfWork.Products.Add(product);
-            await _unitOfWork.SaveChangesAsync();
+        existing.UpdateSku(request.Sku);
+        existing.UpdateInternalCode(request.InternalCode);
+        existing.UpdateName(request.Name);
+        existing.UpdateDescription(request.Description);
+        existing.UpdatePrice(request.CurrentUnitPrice);
+        existing.UpdateStock(request.StockQuantity);
 
-            return _mapper.Map<ProductResponse>(product);
-        }
+        await _productRepository.Update(existing);
+        return _mapper.Map<ProductResponse>(existing);
+    }
 
-        public async Task<ProductResponse?> UpdateAsync(Guid productId, ProductRequest updatedRequest)
-        {
-            var existing = await _unitOfWork.Products.GetById(productId);
-            if (existing is null)
-                return null;
+    public async Task DisableAsync(Guid productId)
+    {
+        var existing = await _productRepository.GetById(productId);
+        if (existing is null) return;
 
-            // Validación de SKU único si se modifica el SKU
-            if (!string.Equals(existing.Sku, updatedRequest.Sku, StringComparison.OrdinalIgnoreCase))
-            {
-                var other = await _unitOfWork.Products.First(p => p.Sku == updatedRequest.Sku);
-                if (other != null)
-                    throw new ProductAlreadyExistsException(updatedRequest.Sku);
-            }
-
-            // Mapear los campos actualizables desde el DTO
-            existing.Name = updatedRequest.Name;
-            existing.Description = updatedRequest.Description;
-            existing.CurrentUnitPrice = updatedRequest.CurrentUnitPrice;
-            existing.StockQuantity = updatedRequest.StockQuantity;
-            existing.Sku = updatedRequest.Sku;
-
-            await _unitOfWork.Products.Update(existing);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<ProductResponse>(existing);
-        }
-
-        public async Task DisableAsync(Guid productId)
-        {
-            var product = await _unitOfWork.Products.GetById(productId);
-
-            if (product is null)
-                throw new NotFoundException("Producto no encontrado.");
-
-            if (!product.IsActive)
-                throw new ApplicationException("El producto ya está inhabilitado.");
-
-            product.IsActive = false;
-            await _unitOfWork.Products.Update(product);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
+        existing.Disable();
+        await _productRepository.Update(existing);
     }
 }

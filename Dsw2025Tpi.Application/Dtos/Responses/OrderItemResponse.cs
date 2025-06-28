@@ -9,7 +9,7 @@ namespace Dsw2025Tpi.Application.Dtos.Responses;
 public record OrderItemResponse(
     Guid ProductId,
     string ProductName,
-    int Quantity,
     decimal UnitPrice,
+    int Quantity,
     decimal Subtotal
 );
