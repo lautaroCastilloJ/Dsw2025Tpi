@@ -1,11 +1,14 @@
 ﻿using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Dtos.Responses;
 using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/products")]
 public class ProductsController : ControllerBase
 {
@@ -16,20 +19,19 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    // 2. Obtener todos los productos
+    // 2. Obtener todos los productos activos (CORREGIR)
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [Authorize(Roles = "tester")] 
+    public async Task<IActionResult> GetAllActiveProducts([FromQuery]string? name)
     {
         var products = await _productService.GetAllAsync();
-        if (!products.Any())
-            return NoContent(); // 204 si no hay productos
-
-        return Ok(products); // 200 con la lista
+        if (products is null || !products.Any()) return NoContent(); // 204 si no hay productos, "is" es lo mismo que == "igual a"
+        return Ok(products); // 200 con la lista de los productos
     }
 
     // 3. Obtener un producto por ID
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetProductById(Guid id)
     {
         var product = await _productService.GetByIdAsync(id);
         if (product is null)

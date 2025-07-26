@@ -20,7 +20,7 @@ public class ProductService : IProductService
 
     public async Task<ProductResponse?> GetByIdAsync(Guid id)
     {
-        var product = await _productRepository.GetById(id);
+        var product = await _productRepository.GetById(id); // validar si el producto IsActive
         return product is null ? null : _mapper.Map<ProductResponse>(product);
     }
 
