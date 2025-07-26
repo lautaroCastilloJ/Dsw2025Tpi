@@ -1,122 +1,65 @@
 ﻿using AutoMapper;
 using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Dtos.Responses;
-using Dsw2025Tpi.Application.Exceptions;
-using Dsw2025Tpi.Application.Services.Interfaces;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
-using Dsw2025Tpi.Domain.Enums;
-using Dsw2025Tpi.Domain.Interfaces.Repositories;
+using Dsw2025Tpi.Domain.Interfaces;
 
-namespace Dsw2025Tpi.Application.Services
+
+namespace Dsw2025Tpi.Application.Services;
+
+public class OrderService : IOrderService
 {
-    public class OrderService : IOrderService
+    private readonly IRepository<Order> _orderRepository;
+    private readonly IRepository<Product> _productRepository;
+    private readonly IMapper _mapper;
+
+    public OrderService(
+        IRepository<Order> orderRepository,
+        IRepository<Product> productRepository,
+        IMapper mapper)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _orderRepository = orderRepository;
+        _productRepository = productRepository;
+        _mapper = mapper;
+    }
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
+    public async Task<OrderResponse> CreateAsync(OrderRequest request)
+    {
+        if (request.OrderItems == null || !request.OrderItems.Any())
+            throw new ArgumentException("La orden debe contener al menos un ítem.");
+
+        var productIds = request.OrderItems.Select(i => i.ProductId).Distinct();
+        var products = await _productRepository.GetFiltered(p => productIds.Contains(p.Id));
+
+        if (products == null || products.Count() != productIds.Count())
+            throw new ArgumentException("Uno o más productos no existen.");
+
+        var productMap = products.ToDictionary(p => p.Id);
+
+        var orderItems = request.OrderItems.Select(item =>
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+            var product = productMap[item.ProductId];
+            if (!product.HasStock(item.Quantity))
+                throw new InvalidOperationException($"Stock insuficiente para el producto: {product.Name}");
 
-        public async Task<OrderResponse?> GetByIdAsync(Guid id)
-        {
-            var order = await _unitOfWork.Orders.GetById(id, "OrderItems.Product", "Customer");
-            return order is null ? null : _mapper.Map<OrderResponse>(order);
-        }
+            product.DecreaseStock(item.Quantity);
 
-        public async Task<IEnumerable<OrderResponse>> GetAllAsync(
-            string? status = null,
-            Guid? customerId = null,
-            int pageNumber = 1,
-            int pageSize = 10)
-        {
-            var orders = await _unitOfWork.Orders.GetAll("OrderItems.Product", "Customer") ?? new List<Order>();
+            return OrderItem.Create(product.Id, product.Name, product.CurrentUnitPrice, item.Quantity);
+        });
 
-            if (!string.IsNullOrEmpty(status))
-                orders = orders.Where(o => o.Status.ToString().Equals(status, StringComparison.OrdinalIgnoreCase));
+        var order = Order.Create(
+            request.CustomerId,
+            request.ShippingAddress,
+            request.BillingAddress,
+            request.Notes,
+            orderItems,
+            productMap
+        );
 
-            if (customerId.HasValue)
-                orders = orders.Where(o => o.CustomerId == customerId.Value);
+        await _orderRepository.Add(order);
 
-            // Paginación
-            orders = orders.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
-            return orders.Select(o => _mapper.Map<OrderResponse>(o));
-        }
-
-        public async Task<OrderResponse> CreateAsync(OrderRequest request)
-        {
-            // Validar stock y calcular precios
-            var orderItems = new List<OrderItem>();
-            decimal totalAmount = 0;
-
-            foreach (var itemReq in request.OrderItems)
-            {
-                var product = await _unitOfWork.Products.GetById(itemReq.ProductId);
-                if (product is null)
-                    throw new EntityNotFoundException("Producto", itemReq.ProductId);
-
-                if (itemReq.Quantity > product.StockQuantity)
-                    throw new InsufficientStockException(product.Name, product.Sku);
-
-                // Restar stock y fijar precio en el momento de la orden
-                product.StockQuantity -= itemReq.Quantity;
-
-                var unitPrice = product.CurrentUnitPrice;
-                var subtotal = unitPrice * itemReq.Quantity;
-
-                orderItems.Add(new OrderItem
-                {
-                    ProductId = product.Id,
-                    Quantity = itemReq.Quantity,
-                    UnitPrice = unitPrice,
-                    Subtotal = subtotal
-                });
-
-                totalAmount += subtotal;
-
-                // Actualizar el producto en la base (stock)
-                await _unitOfWork.Products.Update(product);
-            }
-
-            var order = new Order
-            {
-                CustomerId = request.CustomerId,
-                ShippingAddress = request.ShippingAddress,
-                BillingAddress = request.BillingAddress,
-                Notes = request.Notes,
-                Date = DateTime.UtcNow,
-                Status = OrderStatus.Pending,
-                OrderItems = orderItems,
-                TotalAmount = totalAmount
-            };
-
-            await _unitOfWork.Orders.Add(order);
-            await _unitOfWork.SaveChangesAsync();
-
-            // Mapear y retornar OrderResponse
-            var fullOrder = await _unitOfWork.Orders.GetById(order.Id, "OrderItems.Product", "Customer");
-            return _mapper.Map<OrderResponse>(fullOrder);
-
-        }
-
-        public async Task<OrderResponse?> UpdateStatusAsync(Guid orderId, string newStatus)
-        {
-            var order = await _unitOfWork.Orders.GetById(orderId, "OrderItems", "Customer");
-            if (order is null)
-                return null;
-
-            if (Enum.TryParse(typeof(OrderStatus), newStatus, true, out var statusObj))
-            {
-                order.Status = (OrderStatus)statusObj;
-                await _unitOfWork.Orders.Update(order);
-                await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<OrderResponse>(order);
-            }
-
-            return null;
-        }
+        var created = await _orderRepository.GetById(order.Id, "Items");
+        return _mapper.Map<OrderResponse>(created);
     }
 }

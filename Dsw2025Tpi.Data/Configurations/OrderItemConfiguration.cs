@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dsw2025Tpi.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Dsw2025Tpi.Domain.Entities;
 
 namespace Dsw2025Tpi.Data.Configurations;
 
@@ -10,26 +10,28 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
     {
         builder.ToTable("OrderItems");
 
-        builder.HasKey(oi => oi.Id);
+        builder.HasKey(o => o.Id);
 
-        builder.Property(oi => oi.Quantity)
+        builder.Property(o => o.ProductId)
             .IsRequired();
 
-        builder.Property(oi => oi.UnitPrice)
+        builder.Property(o => o.ProductName)
             .IsRequired()
-            .HasColumnType("decimal(10,2)");
+            .HasMaxLength(100);
 
-        builder.Property(oi => oi.Subtotal)
-            .IsRequired()
-            .HasColumnType("decimal(10,2)");
+        builder.Property(o => o.UnitPrice)
+            .HasColumnType("decimal(10,2)")
+            .IsRequired();
 
-        // Relaciones
-        builder.HasOne(oi => oi.Product)
-            .WithMany(p => p.OrderItems)
-            .HasForeignKey(oi => oi.ProductId);
+        builder.Property(o => o.Quantity)
+            .IsRequired();
 
-        builder.HasOne(oi => oi.Order)
-            .WithMany(o => o.OrderItems)
-            .HasForeignKey(oi => oi.OrderId);
+        builder.Property(o => o.OrderId)
+            .IsRequired();
+
+        builder.HasOne(o => o.Order)
+            .WithMany(o => o.Items)
+            .HasForeignKey(o => o.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -4,14 +4,28 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
 {
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public decimal Subtotal { get; set; }
 
-    // Relaciones 
-    public Guid OrderId { get; set; } // clave foranea
-    public Order Order { get; set; } // propiedad de navegación que permite acceder directamente al objeto Order relacionado desde una instancia de OrderItem.
+    public int Quantity { get; private set; }
+    public string ProductName { get; private set; } = default!;
+    public decimal UnitPrice { get; private set; }
+    public decimal Subtotal => UnitPrice * Quantity;
+    public Guid OrderId { get; private set; } // Foreign Key explícita
+    public Order Order { get; private set; } = default!; // Navegación inversa
+    public Guid ProductId { get; private set; } // clave foranea
 
-    public Guid ProductId { get; set; } // clave foranea
-    public Product Product { get; set; }
+    private OrderItem() { }
+
+    public static OrderItem Create(Guid productId, string productName, decimal unitPrice, int quantity)
+    {
+        if (unitPrice <= 0) throw new ArgumentException("Precio inválido.");
+        if (quantity <= 0) throw new ArgumentException("Cantidad inválida.");
+
+        return new OrderItem
+        {
+            ProductId = productId,
+            ProductName = productName,
+            UnitPrice = unitPrice,
+            Quantity = quantity
+        };
+    }
 }

@@ -1,13 +1,15 @@
 ﻿using Dsw2025Tpi.Application.Dtos.Requests;
-using Dsw2025Tpi.Application.Services.Interfaces;
+using Dsw2025Tpi.Application.Dtos.Responses;
+using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Dsw2025Tpi.Application.Exceptions;
-
 
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Authorize]
+[Route("api/products")]
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
@@ -17,56 +19,55 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
+    // 2. Obtener todos los productos activos (CORREGIR)
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [Authorize(Roles = "tester")] 
+    public async Task<IActionResult> GetAllActiveProducts([FromQuery]string? name)
     {
         var products = await _productService.GetAllAsync();
-        return Ok(products);
+        if (products is null || !products.Any()) return NoContent(); // 204 si no hay productos, "is" es lo mismo que == "igual a"
+        return Ok(products); // 200 con la lista de los productos
     }
 
+    // 3. Obtener un producto por ID
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetProductById(Guid id)
     {
         var product = await _productService.GetByIdAsync(id);
-        if (product == null)
-            return NotFound();
+        if (product is null)
+            return NotFound(new { error = "Producto no encontrado." });
 
-        return Ok(product);
+        return Ok(product); // 200
     }
 
+    // 1. Crear un producto
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ProductRequest request)
     {
-        var product = await _productService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+        var created = await _productService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created); // 201 Created
     }
 
+    // 4. Actualizar un producto
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] ProductRequest request)
     {
         var updated = await _productService.UpdateAsync(id, request);
-        if (updated == null)
-            return NotFound();
+        if (updated is null)
+            return NotFound(new { error = "Producto no encontrado para actualizar." });
 
-        return Ok(updated);
+        return Ok(updated); // 200 OK
     }
 
+    // 5. Inhabilitar un producto (soft delete)
     [HttpPatch("{id}")]
     public async Task<IActionResult> Disable(Guid id)
     {
-        try
-        {
-            await _productService.DisableAsync(id);
-            return NoContent();
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (ApplicationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
+        var existing = await _productService.GetByIdAsync(id);
+        if (existing is null)
+            return NotFound(new { error = "Producto no encontrado para inhabilitar." });
 
+        await _productService.DisableAsync(id);
+        return NoContent(); // 204
+    }
 }

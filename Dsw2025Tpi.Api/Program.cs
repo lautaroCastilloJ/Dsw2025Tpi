@@ -1,12 +1,14 @@
-using Dsw2025Tpi.Domain.Interfaces.Repositories;
+using Dsw2025Tpi.Api.Middlewares;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Application.Validators;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Dsw2025Tpi.Application.Validators;
-using FluentValidation.AspNetCore;
+using Dsw2025Tpi.Domain.Interfaces;
 using FluentValidation;
-using Dsw2025Tpi.Application.Services.Interfaces;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace Dsw2025Tpi.Api;
 
@@ -21,26 +23,50 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(o =>
+        {
+            o.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Desarrollo de Software",
+                Version = "v1",
+            });
+            o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Description = "Ingresar el token",
+                Type = SecuritySchemeType.ApiKey
+            });
+            o.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
-        builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
+        builder.Services.AddAuthentication()
+            .AddJwtBearer();
+
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-        // Repositorios y UnitOfWork
-        builder.Services.AddScoped<IProductRepository, ProductRepository>();
-        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        // Servicios de aplicación (los crearás en la siguiente capa)
+        builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
-
+        builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<OrderItemRequestValidator>();
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddAutoMapper(typeof(Dsw2025Tpi.Application.Mappings.MappingProfiles));
-
-
 
 
         var app = builder.Build();
@@ -52,7 +78,7 @@ public class Program
             app.UseSwaggerUI();
         }
         
-        app.UseMiddleware<Dsw2025Tpi.Api.Middlewares.ExceptionMiddleware>();
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.UseHttpsRedirection();
 
@@ -62,7 +88,6 @@ public class Program
         
         app.MapHealthChecks("/healthcheck");
 
-        // ---- AQUI CARGA LOS CUSTOMERS ----
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
@@ -71,8 +96,6 @@ public class Program
             var customersJsonPath = Path.Combine(AppContext.BaseDirectory, "customers.json");
             context.SeedCustomers(customersJsonPath); // Carga los customers si faltan
         }
-
-        // ---- FIN BLOQUE DE SEED ----
 
         app.Run();
     }
