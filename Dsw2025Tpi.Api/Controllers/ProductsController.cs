@@ -1,14 +1,11 @@
 ﻿using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Dtos.Responses;
 using Dsw2025Tpi.Application.Interfaces;
-using Dsw2025Tpi.Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("api/products")]
 public class ProductsController : ControllerBase
 {
@@ -19,19 +16,28 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    // 2. Obtener todos los productos activos (CORREGIR)
+    // 1. Crear un producto
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] ProductRequest request)
+    {
+        var created = await _productService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created); // 201 Created
+    }
+
+    // 2. Obtener todos los productos
     [HttpGet]
-    [Authorize(Roles = "tester")] 
-    public async Task<IActionResult> GetAllActiveProducts([FromQuery]string? name)
+    public async Task<IActionResult> GetAll()
     {
         var products = await _productService.GetAllAsync();
-        if (products is null || !products.Any()) return NoContent(); // 204 si no hay productos, "is" es lo mismo que == "igual a"
-        return Ok(products); // 200 con la lista de los productos
+        if (!products.Any())
+            return NoContent(); // 204 si no hay productos
+
+        return Ok(products); // 200 con la lista
     }
 
     // 3. Obtener un producto por ID
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var product = await _productService.GetByIdAsync(id);
         if (product is null)
@@ -40,13 +46,6 @@ public class ProductsController : ControllerBase
         return Ok(product); // 200
     }
 
-    // 1. Crear un producto
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ProductRequest request)
-    {
-        var created = await _productService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created); // 201 Created
-    }
 
     // 4. Actualizar un producto
     [HttpPut("{id}")]

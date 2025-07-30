@@ -1,0 +1,20 @@
+[
+  {
+    "id": "62ffcbf8-d142-4cc8-aef9-f7e1592c3499",
+    "email": "lautaro.castillo@alu.frt.utn.edu.ar",
+    "name": "Lautaro Castillo",
+    "phoneNumber": "3816534422"
+  },
+  {
+    "id": "2d1c4b62-266a-4d0e-bab6-67b4598a70f6",
+    "email": "luisina.svaldi@alu.frt.utn.edu.ar",
+    "name": "Luisina Svaldi",
+    "phoneNumber": "3816573222"
+  },
+  {
+    "id": "e74674e5-9566-44bc-9f0c-527f1d6e0c1c",
+    "email": "cesarbernabe.figueroa@alu.frt.utn.edu.ar",
+    "name": "Bernabe Figueroa",
+    "phoneNumber": "3865432122"
+  }
+]
