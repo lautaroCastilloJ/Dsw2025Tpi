@@ -64,6 +64,14 @@ public class EfRepository<T> : IRepository<T> where T : EntityBase
             .ToListAsync();
     }
 
+    public IQueryable<T> GetAllQueryable(params string[] include)
+    {
+        IQueryable<T> query = _context.Set<T>();
+        foreach (var inc in include)
+            query = query.Include(inc);
+        return query;
+    }
+
     private static IQueryable<T> Include(IQueryable<T> query, string[] includes)
     {
         foreach (var include in includes)

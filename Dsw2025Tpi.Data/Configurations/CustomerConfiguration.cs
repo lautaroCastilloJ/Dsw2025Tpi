@@ -10,17 +10,18 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
     {
         builder.ToTable("Customers");
 
-        builder.HasKey(c => c.Id);
+        builder.Property(c => c.Id)
+               .ValueGeneratedNever(); // ← Esto le dice a EF que respete el valor que le estás dando
 
         builder.Property(c => c.Email)
-            .IsRequired()
-            .HasMaxLength(100);
+               .IsRequired()
+               .HasMaxLength(100);
 
         builder.Property(c => c.Name)
-            .IsRequired()
-            .HasMaxLength(100);
+               .IsRequired()
+               .HasMaxLength(100);
 
         builder.Property(c => c.PhoneNumber)
-            .HasMaxLength(20);
+               .HasMaxLength(20);
     }
 }

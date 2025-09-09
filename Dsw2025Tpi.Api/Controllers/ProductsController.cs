@@ -1,6 +1,7 @@
 ﻿using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Dtos.Responses;
 using Dsw2025Tpi.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;
@@ -16,17 +17,23 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    // 1. Crear un producto
+
+    
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Create([FromBody] ProductRequest request)
     {
         var created = await _productService.CreateAsync(request);
+        if (created is null)
+            return BadRequest(new { error = "Error al crear el producto. Verifique los datos." });
+
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created); // 201 Created
     }
 
-    // 2. Obtener todos los productos
+
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllActiveProducts()
     {
         var products = await _productService.GetAllAsync();
         if (!products.Any())
@@ -35,8 +42,9 @@ public class ProductsController : ControllerBase
         return Ok(products); // 200 con la lista
     }
 
-    // 3. Obtener un producto por ID
+
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(Guid id)
     {
         var product = await _productService.GetByIdAsync(id);
@@ -47,8 +55,9 @@ public class ProductsController : ControllerBase
     }
 
 
-    // 4. Actualizar un producto
+ 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Update(Guid id, [FromBody] ProductRequest request)
     {
         var updated = await _productService.UpdateAsync(id, request);
@@ -58,8 +67,9 @@ public class ProductsController : ControllerBase
         return Ok(updated); // 200 OK
     }
 
-    // 5. Inhabilitar un producto (soft delete)
+
     [HttpPatch("{id}")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Disable(Guid id)
     {
         var existing = await _productService.GetByIdAsync(id);

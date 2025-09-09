@@ -29,6 +29,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.Status)
             .HasConversion<string>()
             .IsRequired();
+  
 
         builder.HasMany(typeof(OrderItem))
                .WithOne()

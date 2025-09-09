@@ -4,11 +4,11 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Customer : EntityBase
 {
-    public string Email { get; private set; } = default!;
-    public string Name { get; private set; } = default!;
-    public string PhoneNumber { get; private set; } = default!;
+    public string? Email { get; set; }
+    public string? Name { get; set; }
+    public string? PhoneNumber { get; set; }
 
-    private Customer() { }
+    public Customer() { }
 
     public static Customer Create(string email, string name, string phone)
     {

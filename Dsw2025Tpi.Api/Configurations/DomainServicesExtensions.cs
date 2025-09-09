@@ -3,7 +3,6 @@ using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Helpers;
 using Dsw2025Tpi.Data.Repositories;
-using Dsw2025Tpi.Domain;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 
@@ -28,7 +27,7 @@ public static class DomainServicesConfigurationExtension
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IOrderService, OrderService>();
-
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

@@ -12,14 +12,10 @@ public class Product : EntityBase
     public int StockQuantity { get; private set; }
     public bool IsActive { get; private set; } = true;
 
-    private Product() { } // For EF Core
+    public Product() { } // For EF Core
 
     public static Product Create(string sku, string internalCode, string name, string? description, decimal price, int stockQty)
     {
-        if (string.IsNullOrWhiteSpace(sku)) throw new ArgumentException("SKU obligatorio.");
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nombre obligatorio.");
-        if (price <= 0) throw new ArgumentException("Precio debe ser mayor a cero.");
-        if (stockQty < 0) throw new ArgumentException("Stock no puede ser negativo.");
 
         return new Product
         {
@@ -75,6 +71,8 @@ public class Product : EntityBase
     {
         IsActive = true;
     }
+     
+
 
     public void DecreaseStock(int quantity)
     {
@@ -85,3 +83,13 @@ public class Product : EntityBase
 
     public bool HasStock(int quantity) => quantity <= StockQuantity;
 }
+
+
+/*
+ 
+         if (string.IsNullOrWhiteSpace(sku)) throw new ArgumentException("SKU obligatorio.");
+        if (string.IsNullOrWhiteSpace(internalCode)) throw new ArgumentException("InternalCode obligatorio.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nombre obligatorio.");
+        if (price <= 0) throw new ArgumentException("Precio debe ser mayor a cero.");
+        if (stockQty < 0) throw new ArgumentException("Stock no puede ser negativo.");
+ */

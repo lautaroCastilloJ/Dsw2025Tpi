@@ -8,9 +8,12 @@ namespace Dsw2025Tpi.Domain.Entities;
 public class Order : EntityBase
 {
     public DateTime Date { get; private set; } = DateTime.UtcNow;
-    public string ShippingAddress { get; private set; } = default!;
-    public string BillingAddress { get; private set; } = default!;
+    public string? ShippingAddress { get; private set; }
+    public string? BillingAddress { get; private set; }
     public string? Notes { get; private set; }
+    public Guid CustomerId { get; private set; }
+    public Customer? Customer { get; private set; }
+
     public OrderStatus Status { get; private set; } = OrderStatus.Pending;
 
     private readonly List<OrderItem> _items = new();
@@ -18,7 +21,7 @@ public class Order : EntityBase
 
     public decimal TotalAmount => _items.Sum(i => i.Subtotal);
 
-    private Order() { }
+    public Order() { }
 
     public static Order Create(
         Guid customerId,
@@ -28,10 +31,7 @@ public class Order : EntityBase
         IEnumerable<OrderItem> items,
         IDictionary<Guid, Product> stockSource)
     {
-        if (string.IsNullOrWhiteSpace(shippingAddress))
-            throw new ArgumentException("Dirección de envío requerida.");
-        if (string.IsNullOrWhiteSpace(billingAddress))
-            throw new ArgumentException("Dirección de facturación requerida.");
+     
         if (!items.Any())
             throw new ArgumentException("La orden debe tener al menos un item.");
 
@@ -42,15 +42,16 @@ public class Order : EntityBase
 
             if (!product.HasStock(item.Quantity))
                 throw new InvalidOperationException($"Stock insuficiente para el producto: {item.ProductName}");
-
-            product.DecreaseStock(item.Quantity); // Solo si pasó las validaciones
         }
+
 
         var order = new Order
         {
+            CustomerId = customerId,
             ShippingAddress = shippingAddress,
             BillingAddress = billingAddress,
-            Notes = notes
+            Notes = notes,
+          
         };
 
         order._items.AddRange(items);

@@ -2,153 +2,30 @@
 ## Desarrollo de Software
 ### Backend
 
-#  Guía de uso de la API - Proyecto Dsw2025Tpi 
+## Introducción
+Se desea desarrollar una plataforma de comercio electrónico (E-commerce). 
+En esta primera etapa el objetivo es construir el módulo de Órdenes, permitiendo la gestión completa de éstas.
 
-Esta guía explica cómo probar cada uno de los endpoints de la API desde Swagger.
+## Visión General del Producto
+Del relevamiento preliminar se identificaron los siguientes requisitos:
+- Los visitantes pueden consultar los productos sin necesidad de estar registrados o iniciar sesión.
+- Para realizar un pedido se requiere el inicio de sesión.
+- Una orden, para ser aceptada, debe incluir la información básica del cliente, envío y facturación.
+- Antes de registrar la orden se debe verificar la disponibilidad de stock (o existencias) de los productos.
+- Si la orden es exitosa hay que actualizar el stock de cada producto.
+- Se deben poder consultar órdenes individuales o listar varias con posibilidad de filtrado.
+- Será necesario el cambio de estado de una orden a medida que avanza en su ciclo de vida.
+- Los administradores solo pueden gestionar los productos (alta, modificación y baja) y actualizar el estado de la orden.
+- Los clientes pueden crear y consultar órdenes.
 
----
+[Documento completo](https://frtutneduar.sharepoint.com/:b:/s/DSW2025/ETueAd4rTe1Gilj_Yfi64RYB5oz9s2dOamxKSfMFPREbiA?e=azZcwg) 
 
-##  Productos
-
-###  POST /api/products
-Crea un producto nuevo.
-
- Ejemplo de entrada (JSON):
-json
-{
-  "sku": "SKU-123",
-  "internalCode": "INT-456",
-  "name": "Producto de Prueba",
-  "description": "Este es un producto de ejemplo",
-  "currentUnitPrice": 299.99,
-  "stockQuantity": 100
-}
-
-
- Devuelve el producto creado (con ID generado).
-
----
-
-###  GET /api/products
-Lista todos los productos activos.
-
- No requiere parámetros.
-
- Respuesta ejemplo:
-json
-[
-  {
-    "id": "c5a587f2-1c2a-4f22-90de-9fdab53be120",
-    "sku": "SKU-123",
-    "internalCode": "INT-456",
-    "name": "Producto de Prueba",
-    "description": "Este es un producto de ejemplo",
-    "currentUnitPrice": 299.99,
-    "stockQuantity": 100,
-    "isActive": true
-  }
-]
+## Alcance para el Primer Parcial
+> [!IMPORTANT]
+> Del apartado `IMPLEMENTACIÓN` (Pag. 7), completo hasta el punto `6` (inclusive)
 
 
----
+### Características de la Solución
 
-###  GET /api/products/{id}
-Busca un producto por ID.
-
- Parámetro de ruta:
-- id: GUID del producto
-
- Devuelve el producto si existe, 404 si no.
-
----
-
-###  PUT /api/products/{id}
-Actualiza un producto existente.
-
- Ejemplo de entrada:
-json
-{
-  "sku": "SKU-999",
-  "internalCode": "INT-888",
-  "name": "Producto Actualizado",
-  "description": "Nueva descripción",
-  "currentUnitPrice": 250.00,
-  "stockQuantity": 80
-}
-
-
----
-
-###  PATCH /api/products/{id}
-Inhabilita un producto (soft delete).
-
- Parámetro de ruta:
-- id: GUID del producto
-
-Devuelve 204 No Content si fue exitoso.
-
----
-
-##  Órdenes
-
-###  POST /api/orders
-Crea una orden con uno o varios productos.
-
- Ejemplo de entrada:
-json
-{
-  "customerId": "b3fc31ef-9d25-4e7e-9c7f-53f6f11e1234",
-  "shippingAddress": "Calle Falsa 123",
-  "billingAddress": "Calle Falsa 123",
-  "notes": "Por favor entregar por la mañana",
-  "orderItems": [
-    {
-      "productId": "c5a587f2-1c2a-4f22-90de-9fdab53be120",
-      "quantity": 2
-    }
-  ]
-}
-
-
- Devuelve la orden creada.
-
----
-
-### 🛠 PATCH /api/orders/{id}/status
-Actualiza el estado de una orden.
-
- Ejemplo de entrada:
-json
-{
-  "newStatus": "Delivered"
-}
-
- Estados posibles:
-- Pending
-- Processing
-- Shipped
-- Delivered
-- Cancelled
-
- Devuelve 200 si fue exitoso, 400 si no es válido.
-
----
-
-##  Tecnologías utilizadas
-
-- .NET 8
-- ASP.NET Core
-- Entity Framework Core
-- AutoMapper
-- FluentValidation
-- SQL Server
-- Swagger / Swashbuckle
-- Patrón Domain-Driven Design (DDD)
-
----
-
-##  Integrantes
-
-- Castillo, Lautaro - 50527
-- Figueroa, Cesar Bernabé - 57150
-- Svaldi, Luisina - 53873
+- Lenguaje: C# 12.0
+- Plataforma: .NET 8

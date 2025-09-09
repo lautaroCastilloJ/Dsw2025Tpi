@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dsw2025Tpi.Data.Configurations;
 using Dsw2025Tpi.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dsw2025Tpi.Data
 {
@@ -10,18 +11,20 @@ namespace Dsw2025Tpi.Data
         {
         }
 
-        // DbSet para cada entidad principal
+
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Customer> Customers { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            // Aplica automáticamente todas las configuraciones que implementan IEntityTypeConfiguration<Entities>
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Dsw2025TpiContext).Assembly);
+            base.OnModelCreating(builder);
 
-            base.OnModelCreating(modelBuilder);
+            builder.ApplyConfiguration(new CustomerConfiguration());
+            builder.ApplyConfiguration(new ProductConfiguration());
+            builder.ApplyConfiguration(new OrderConfiguration());
+            builder.ApplyConfiguration(new OrderItemConfiguration());
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Dsw2025Tpi.Application.Dtos.Responses;
 public record OrderResponse(
     Guid Id,
+    Guid CustomerId,
     DateTime Date,
     string ShippingAddress,
     string BillingAddress,
@@ -15,19 +16,3 @@ public record OrderResponse(
     decimal TotalAmount,
     List<OrderItemResponse> Items
 );
-
-/*
- public record OrderResponse(
-    Guid Id,
-    DateTime Date,
-    string Status,
-    Guid CustomerId,
-    string CustomerName,
-    string ShippingAddress,
-    string BillingAddress,
-    decimal TotalAmount,
-    List<OrderItemResponse> OrderItems
-);
-
- 
- */

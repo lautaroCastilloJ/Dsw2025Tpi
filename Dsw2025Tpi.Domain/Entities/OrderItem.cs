@@ -13,7 +13,7 @@ public class OrderItem : EntityBase
     public Order Order { get; private set; } = default!; // Navegación inversa
     public Guid ProductId { get; private set; } // clave foranea
 
-    private OrderItem() { }
+    public OrderItem() { }
 
     public static OrderItem Create(Guid productId, string productName, decimal unitPrice, int quantity)
     {
