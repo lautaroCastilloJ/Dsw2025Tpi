@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Text;
 
 
@@ -24,7 +25,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+        // Add services to the container. (localdb)\\MSSQLLocalDB
 
         builder.Services.AddControllers();
       
@@ -97,9 +98,13 @@ public class Program
 
 
         builder.Services.AddDomainServices(builder.Configuration);
+
         builder.Services.AddDbContext<AuthenticateContext>(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            options.UseSqlServer(
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                sql => sql.EnableRetryOnFailure()
+                );
         });
 
         builder.Services.AddSingleton<JwtTokenService>();
@@ -126,6 +131,7 @@ public class Program
         });
 
         var app = builder.Build();
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
