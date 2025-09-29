@@ -1,6 +1,5 @@
 ﻿using Dsw2025Tpi.Application.Dtos.Requests;
 using Dsw2025Tpi.Application.Dtos.Responses;
-using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +11,7 @@ namespace Dsw2025Tpi.Api.Controllers;
 [Route("api/orders")]
 public class OrdersController : ControllerBase
 {
-    private readonly IOrderService? _orderService;
+    private readonly IOrderService _orderService;
     public OrdersController(IOrderService orderService)
     {
         _orderService = orderService;
@@ -24,7 +23,7 @@ public class OrdersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<OrderResponse>> CreateOrder([FromBody] OrderRequest request)
     {
-        var createdOrder = await _orderService!.CreateAsync(request);
+        var createdOrder = await _orderService.CreateAsync(request);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -44,7 +43,7 @@ public class OrdersController : ControllerBase
     [FromQuery] int pageNumber = 1,
     [FromQuery] int pageSize = 10)
     {
-        var orders = await _orderService!.GetAllAsync(status, customerId, pageNumber, pageSize);
+        var orders = await _orderService.GetAllAsync(status, customerId, pageNumber, pageSize);
         return Ok(orders);
     }
 
@@ -53,10 +52,7 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = "Administrador, Cliente")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _orderService!.GetByIdAsync(id);
-        if (result is null)
-            return NotFound(new { error = "Orden no encontrada." });
-
+        var result = await _orderService.GetByIdAsync(id);
         return Ok(result);
     }
 
@@ -64,10 +60,7 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateOrderStatusRequest request)
     {
-        var updatedOrder = await _orderService!.UpdateStatusAsync(id, request.NewStatus);
-        if (updatedOrder is null)
-            return NotFound(new { error = "Orden no encontrada para actualizar estado." });
-
+        var updatedOrder = await _orderService.UpdateStatusAsync(id, request.NewStatus);
         return Ok(updatedOrder);
     }
 

@@ -24,9 +24,6 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] ProductRequest request)
     {
         var created = await _productService.CreateAsync(request);
-        if (created is null)
-            return BadRequest(new { error = "Error al crear el producto. Verifique los datos." });
-
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created); // 201 Created
     }
 
