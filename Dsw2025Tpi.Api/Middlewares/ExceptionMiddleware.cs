@@ -69,3 +69,14 @@ public class ExceptionMiddleware
         await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
     }
 }
+
+/*
+
+Esta clase ExceptionMiddleware que tenés en tu capa de API es un middleware personalizado 
+para manejar excepciones globalmente en tu aplicación ASP.NET Core. 
+Es una excelente práctica para evitar tener try-catch en cada controlador y centralizar el 
+tratamiento de errores.
+
+
+
+*/
