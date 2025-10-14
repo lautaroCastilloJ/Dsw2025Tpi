@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Dsw2025Tpi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialEF : Migration
+    public partial class initialSeedEf : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
