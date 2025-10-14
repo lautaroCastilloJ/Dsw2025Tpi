@@ -1,9 +1,9 @@
 ﻿namespace Dsw2025Tpi.Application.Exceptions;
 
-public class InsufficientStockException : Exception
+public class InsufficientStockException : ExceptionBase
 {
-    public InsufficientStockException(string productName, string sku)
-        : base($"Stock insuficiente para el producto {productName} (SKU: {sku}).")
+    public InsufficientStockException(string code, string message) : base(code, message)
     {
+
     }
 }
