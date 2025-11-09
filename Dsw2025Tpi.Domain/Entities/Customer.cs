@@ -1,5 +1,4 @@
 ﻿
-
 namespace Dsw2025Tpi.Domain.Entities;
 
 public class Customer : EntityBase
