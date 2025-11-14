@@ -15,5 +15,4 @@ public record ProductResponse(
     decimal CurrentUnitPrice,
     int StockQuantity,
     bool IsActive
-
 );
