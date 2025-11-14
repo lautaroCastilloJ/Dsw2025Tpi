@@ -1,11 +1,137 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dsw2025Tpi.Domain.Exceptions.ProductExceptions;
 
 namespace Dsw2025Tpi.Domain.Entities;
 
-public class Product
+public sealed class Product
 {
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public string Sku { get; private set; }
+    public string InternalCode { get; private set; }
+    public string Name { get; private set; }
+    public string Description { get; private set; }
+    public decimal CurrentUnitPrice { get; private set; }
+    public int StockQuantity { get; private set; }
+    public bool IsActive { get; private set; }
+
+    private Product() { } // EF Core
+
+    private Product(
+        string sku,
+        string internalCode,
+        string name,
+        string description,
+        decimal price,
+        int stock)
+    {
+        SetSku(sku);
+        SetInternalCode(internalCode);
+        SetName(name);
+        SetDescription(description);
+        SetPrice(price);
+        SetStock(stock);
+        IsActive = true;
+    }
+
+    public static Product Create(
+        string sku,
+        string internalCode,
+        string name,
+        string description,
+        decimal price,
+        int stock)
+        => new Product(sku, internalCode, name, description, price, stock);
+
+    // --------- Behavior ---------
+
+    public void UpdatePrice(decimal newPrice)
+    {
+        EnsureActive();
+
+        if (newPrice <= 0)
+            throw new InvalidProductPriceException();
+
+        CurrentUnitPrice = newPrice;
+    }
+
+    public void AddStock(int quantity)
+    {
+        EnsureActive();
+
+        if (quantity <= 0)
+            throw new InvalidProductQuantityException();
+
+        StockQuantity += quantity;
+    }
+
+    public void DecreaseStock(int quantity)
+    {
+        EnsureActive();
+
+        if (quantity <= 0)
+            throw new InvalidProductQuantityException();
+
+        if (StockQuantity < quantity)
+            throw new InsufficientProductStockException();
+
+        StockQuantity -= quantity;
+    }
+
+    public void Activate() => IsActive = true;
+
+    public void Deactivate() => IsActive = false;
+
+    public bool HasSufficientStock(int requestedQty) =>
+        IsActive && requestedQty > 0 && StockQuantity >= requestedQty;
+
+    // --------- Private invariant methods ---------
+
+    private void EnsureActive()
+    {
+        if (!IsActive)
+            throw new ProductInactiveException();
+    }
+
+    private void SetSku(string sku)
+    {
+        if (string.IsNullOrWhiteSpace(sku))
+            throw new InvalidProductException("PRODUCT_INVALID_SKU");
+
+        Sku = sku.Trim();
+    }
+
+    private void SetInternalCode(string internalCode)
+    {
+        if (string.IsNullOrWhiteSpace(internalCode))
+            throw new InvalidProductException("PRODUCT_INVALID_INTERNAL_CODE");
+
+        InternalCode = internalCode.Trim();
+    }
+
+    private void SetName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new InvalidProductException("PRODUCT_INVALID_NAME");
+
+        Name = name.Trim();
+    }
+
+    private void SetDescription(string desc)
+        => Description = desc?.Trim() ?? string.Empty;
+
+    private void SetPrice(decimal price)
+    {
+        if (price <= 0)
+            throw new InvalidProductPriceException();
+
+        CurrentUnitPrice = price;
+    }
+
+    private void SetStock(int stock)
+    {
+        if (stock < 0)
+            throw new InvalidProductStockException();
+
+        StockQuantity = stock;
+    }
 }
+

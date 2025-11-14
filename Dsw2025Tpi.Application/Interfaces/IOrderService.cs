@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dsw2025Tpi.Application.Interfaces
+namespace Dsw2025Tpi.Application.Interfaces;
+
+internal interface IOrderService
 {
-    internal interface IOrderService
-    {
-    }
 }
