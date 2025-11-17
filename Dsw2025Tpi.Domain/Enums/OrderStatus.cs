@@ -3,7 +3,7 @@
 public enum OrderStatus
 {
     Pending, // Pendiente
-    Paid, // Pagada
+    Processing, // En proceso 
     Cancelled, // Cancelada
     Shipped, // Enviada
     Delivered // Entregada

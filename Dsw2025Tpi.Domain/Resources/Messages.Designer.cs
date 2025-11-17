@@ -59,5 +59,50 @@ namespace Dsw2025Tpi.Domain.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El cliente ya se encuentra inactivo..
+        /// </summary>
+        internal static string CUSTOMER_ALREADY_INACTIVE {
+            get {
+                return ResourceManager.GetString("CUSTOMER_ALREADY_INACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El cliente está inactivo y no puede operar, revise su situación..
+        /// </summary>
+        internal static string CUSTOMER_INACTIVE {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El email del cliente no es válido..
+        /// </summary>
+        internal static string CUSTOMER_INVALID_EMAIL {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INVALID_EMAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El nombre del cliente no es válido..
+        /// </summary>
+        internal static string CUSTOMER_INVALID_NAME {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INVALID_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El número de teléfono del cliente no es válido..
+        /// </summary>
+        internal static string CUSTOMER_INVALID_PHONE {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INVALID_PHONE", resourceCulture);
+            }
+        }
     }
 }

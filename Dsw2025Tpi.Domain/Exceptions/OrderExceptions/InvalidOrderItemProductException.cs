@@ -2,8 +2,8 @@
 
 namespace Dsw2025Tpi.Domain.Exceptions.OrderExceptions;
 
-public sealed class InvalidOrderItemProduct : ExceptionBase
+public sealed class InvalidOrderItemProductException : ExceptionBase
 {
-    public InvalidOrderItemProduct()
+    public InvalidOrderItemProductException()
         : base("ORDERITEM_INVALID_PRODUCT") { }
 }
