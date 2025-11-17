@@ -26,7 +26,7 @@ public abstract class ExceptionBase : Exception
         // - "PRODUCT_INVALID_PRICE"
         string key = code.Replace(".", "_");
 
-        return ErrorMessages.ResourceManager.GetString(key)
+        return Messages.ResourceManager.GetString(key)
             ?? $"Unknown error code: {code}";
     }
 }

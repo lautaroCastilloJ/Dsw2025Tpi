@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dsw2025Tpi.Domain.Entities
+namespace Dsw2025Tpi.Domain.Entities;
+
+internal class Order
 {
-    internal class Order
-    {
-    }
 }
