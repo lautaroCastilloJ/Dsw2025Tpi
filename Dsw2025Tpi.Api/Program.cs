@@ -1,4 +1,6 @@
 
+using Dsw2025Tpi.Api.Middlewares;
+
 namespace Dsw2025Tpi.Api;
 
 public class Program
@@ -23,6 +25,8 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseHttpsRedirection();
 
