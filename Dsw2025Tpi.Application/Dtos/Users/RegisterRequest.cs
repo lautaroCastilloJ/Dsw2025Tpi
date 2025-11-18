@@ -6,6 +6,7 @@ public record RegisterRequest(
     string UserName, 
     string Password, 
     string Email, 
-    string DisplayName, 
+    string DisplayName,
+    string? PhoneNumber,
     string? Role
 );

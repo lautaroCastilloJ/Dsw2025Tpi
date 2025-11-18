@@ -44,7 +44,8 @@ public class UserService : IUserService
             var result = await _userManager.CreateAsync(user, request.Password);
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                // Log detallado de los errores
+                var errors = string.Join(" | ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
                 throw new UserCreationFailedException(errors);
             }
 
@@ -55,7 +56,7 @@ public class UserService : IUserService
             var roleResult = await _userManager.AddToRoleAsync(user, role);
             if (!roleResult.Succeeded)
             {
-                var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                var roleErrors = string.Join(" | ", roleResult.Errors.Select(e => $"{e.Code}: {e.Description}"));
                 throw new UserCreationFailedException(roleErrors);
             }
 
@@ -65,13 +66,14 @@ public class UserService : IUserService
                 var customer = Customer.Create(
                     request.Email,
                     request.DisplayName,
-                    "" // PhoneNumber vacío inicialmente
+                    request.PhoneNumber
                 );
 
                 await _customerRepository.Add(customer);
 
                 // 3. Asignar CustomerId al AppUser
                 user.CustomerId = customer.Id;
+                user.PhoneNumber = request.PhoneNumber;
                 await _userManager.UpdateAsync(user);
             }
 

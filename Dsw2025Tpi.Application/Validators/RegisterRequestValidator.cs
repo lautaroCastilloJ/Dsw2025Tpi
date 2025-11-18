@@ -13,10 +13,10 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
             .Length(3, 20).WithMessage("El nombre de usuario debe tener entre 3 y 20 caracteres.")
             .Matches(@"^[a-zA-Z0-9_.-]+$").WithMessage("El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.");
 
-        // Password
+        // Password - Sincronizado con Program.cs (RequiredLength = 8)
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("La contraseña es obligatoria.")
-            .MinimumLength(6).WithMessage("La contraseña debe tener al menos 6 caracteres.")
+            .MinimumLength(8).WithMessage("La contraseña debe tener al menos 8 caracteres.")
             .Matches(@"[A-Z]").WithMessage("La contraseña debe contener al menos una letra mayúscula.")
             .Matches(@"[a-z]").WithMessage("La contraseña debe contener al menos una letra minúscula.")
             .Matches(@"\d").WithMessage("La contraseña debe contener al menos un número.")
@@ -38,10 +38,10 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
             .MaximumLength(50).WithMessage("El rol no puede exceder los 50 caracteres.")
             .When(x => !string.IsNullOrWhiteSpace(x.Role));
 
-        // Si quisieras limitar a ciertos roles:
+        // Validar roles permitidos
         RuleFor(x => x.Role)
              .Must(role => new[] { "Administrador", "Cliente" }.Contains(role))
              .When(x => !string.IsNullOrWhiteSpace(x.Role))
-             .WithMessage("El rol especificado no es válido.");
+             .WithMessage("El rol especificado no es válido. Roles válidos: Administrador, Cliente");
     }
 }

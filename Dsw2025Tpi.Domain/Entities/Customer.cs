@@ -7,12 +7,12 @@ public sealed class Customer : EntityBase
 {
     public string Email { get; private set; }
     public string Name { get; private set; }
-    public string PhoneNumber { get; private set; }
+    public string? PhoneNumber { get; private set; }
     public bool IsActive { get; private set; }
 
     private Customer() { } // Ctor para EF Core
 
-    private Customer(string email, string name, string phoneNumber)
+    private Customer(string email, string name, string? phoneNumber)
     {
         SetEmail(email);
         SetName(name);
@@ -20,13 +20,13 @@ public sealed class Customer : EntityBase
         IsActive = true;
     }
 
-    public static Customer Create(string email, string name, string phoneNumber)
+    public static Customer Create(string email, string name, string? phoneNumber)
         => new Customer(email, name, phoneNumber);
 
     
     // ----------------- Comportamiento de dominio -----------------
 
-    public void UpdateContactInfo(string email, string name, string phoneNumber)
+    public void UpdateContactInfo(string email, string name, string? phoneNumber)
     {
         EnsureActive();
 
@@ -47,7 +47,7 @@ public sealed class Customer : EntityBase
         SetName(name);
     }
 
-    public void ChangePhoneNumber(string phoneNumber)
+    public void ChangePhoneNumber(string? phoneNumber)
     {
         EnsureActive();
         SetPhoneNumber(phoneNumber);
@@ -99,10 +99,14 @@ public sealed class Customer : EntityBase
         Name = name.Trim();
     }
 
-    private void SetPhoneNumber(string phoneNumber)
+    private void SetPhoneNumber(string? phoneNumber)
     {
+        // PhoneNumber es opcional, permite null
         if (string.IsNullOrWhiteSpace(phoneNumber))
-            throw new InvalidCustomerPhoneException(phoneNumber);
+        {
+            PhoneNumber = phoneNumber;
+            return;
+        }
 
         PhoneNumber = phoneNumber.Trim();
     }
