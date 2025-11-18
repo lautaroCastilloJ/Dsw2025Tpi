@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dsw2025Tpi.Application.Dtos.Product;
+namespace Dsw2025Tpi.Application.Dtos.Products;
 
 public record ProductRequest(
     string Sku,

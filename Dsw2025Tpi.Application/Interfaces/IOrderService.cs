@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dsw2025Tpi.Application.Dtos.Orders;
+using Dsw2025Tpi.Application.Pagination;
+
 
 namespace Dsw2025Tpi.Application.Interfaces;
 
-internal interface IOrderService
+public interface IOrderService
 {
+    Task<OrderResponse> CreateOrderAsync(OrderRequest request);
+    Task<IEnumerable<OrderResponse>> GetAllOrdersAsync(string? status, Guid? customerId, int pageNumber, int pageSize);
+    Task<OrderResponse> GetOrderByIdAsync(Guid id);
+    Task<OrderResponse> UpdateOrderStatusAsync(Guid id, string newStatus);
+    Task<PagedResult<OrderListItemDto>> GetPagedAsync(
+    FilterOrder filter,
+    CancellationToken cancellationToken = default);
+
 }

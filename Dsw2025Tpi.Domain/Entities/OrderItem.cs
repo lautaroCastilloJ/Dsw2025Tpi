@@ -3,16 +3,15 @@
 
 namespace Dsw2025Tpi.Domain.Entities;
 
-public sealed class OrderItem
+public sealed class OrderItem : EntityBase 
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
-    public Guid OrderId { get; private set; }
-    public Guid ProductId { get; private set; }
     public int Quantity { get; private set; }
     public decimal UnitPrice { get; private set; }
-
-    // Derivado: el backend calcula el Subtotal en base a Quantity y UnitPrice
-    public decimal Subtotal => Quantity * UnitPrice;
+    public decimal Subtotal => Quantity * UnitPrice; // El backend calcula el Subtotal en base a Quantity y UnitPrice, por lo tanto no tiene setter ya que es calculo derivado.
+    public Guid OrderId { get; private set; } // Foreign Key
+    public Guid ProductId { get; private set; } // Foreign Key
+    public string ProductName { get; private set; } // Nombre del producto
+    public Order? Order { get; private set; } // Propiedad de navegación
 
     private OrderItem() { } // for EF
 
@@ -34,7 +33,7 @@ public sealed class OrderItem
     private void SetProduct(Guid productId)
     {
         if (productId == Guid.Empty)
-            throw new InvalidOrderItemProduct();
+            throw new InvalidOrderItemProductException();
         ProductId = productId;
     }
 

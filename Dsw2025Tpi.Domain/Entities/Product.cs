@@ -2,9 +2,8 @@
 
 namespace Dsw2025Tpi.Domain.Entities;
 
-public sealed class Product
+public sealed class Product : EntityBase
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
     public string Sku { get; private set; }
     public string InternalCode { get; private set; }
     public string Name { get; private set; }
@@ -41,7 +40,21 @@ public sealed class Product
         int stock)
         => new Product(sku, internalCode, name, description, price, stock);
 
-    // --------- Behavior ---------
+    // --------- Update method ---------
+
+    public void UpdateDetails(string sku, string internalCode, string name, string description, decimal price, int stock)
+    {
+        EnsureActive();
+
+        SetSku(sku);
+        SetInternalCode(internalCode);
+        SetName(name);
+        SetDescription(description);
+        SetPrice(price);
+        SetStock(stock);
+    }
+
+    // --------- ---------
 
     public void UpdatePrice(decimal newPrice)
     {
@@ -76,9 +89,18 @@ public sealed class Product
         StockQuantity -= quantity;
     }
 
-    public void Activate() => IsActive = true;
+    public void Activate()
+    {
+        if (IsActive) return;
+        IsActive = true;
+    }
 
-    public void Deactivate() => IsActive = false;
+    public void Deactivate()
+    {
+        if (!IsActive) return;
+        IsActive = false;
+    }
+
 
     public bool HasSufficientStock(int requestedQty) =>
         IsActive && requestedQty > 0 && StockQuantity >= requestedQty;

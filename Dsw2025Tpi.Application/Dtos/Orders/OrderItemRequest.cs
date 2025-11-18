@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dsw2025Tpi.Application.Dtos.Order;
+namespace Dsw2025Tpi.Application.Dtos.Orders;
 
 public record OrderItemRequest(
     Guid ProductId,

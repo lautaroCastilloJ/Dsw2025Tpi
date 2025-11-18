@@ -6,5 +6,10 @@ public abstract class EntityBase
     {
         Id = Guid.NewGuid();
     }
-    public Guid Id { get; set; }
+    protected EntityBase(Guid id)
+    {
+        Id = id == Guid.Empty ? Guid.NewGuid() : id;
+    }
+
+    public Guid Id { get; protected set; } // el Id no debería poder cambiarse libremente desde afuera del dominio.
 }

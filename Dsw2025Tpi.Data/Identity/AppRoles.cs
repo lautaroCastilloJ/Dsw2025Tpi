@@ -1,4 +1,4 @@
-
+﻿
 namespace Dsw2025Tpi.Data.Identity;
 
 public static class AppRoles

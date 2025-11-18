@@ -59,5 +59,239 @@ namespace Dsw2025Tpi.Domain.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Las credenciales ingresadas son inválidas. Verifique su usuario y contraseña..
+        /// </summary>
+        internal static string AUTH_INVALID_CREDENTIALS {
+            get {
+                return ResourceManager.GetString("AUTH_INVALID_CREDENTIALS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No se pudo crear el usuario. Verifique que el usuario y correo electrónico sean válidos y únicos..
+        /// </summary>
+        internal static string AUTH_USER_CREATION_FAILED {
+            get {
+                return ResourceManager.GetString("AUTH_USER_CREATION_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El cliente ya se encuentra inactivo..
+        /// </summary>
+        internal static string CUSTOMER_ALREADY_INACTIVE {
+            get {
+                return ResourceManager.GetString("CUSTOMER_ALREADY_INACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El cliente está inactivo y no puede operar, revise su situación..
+        /// </summary>
+        internal static string CUSTOMER_INACTIVE {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El email del cliente no es válido..
+        /// </summary>
+        internal static string CUSTOMER_INVALID_EMAIL {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INVALID_EMAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El nombre del cliente no es válido..
+        /// </summary>
+        internal static string CUSTOMER_INVALID_NAME {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INVALID_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El número de teléfono del cliente no es válido..
+        /// </summary>
+        internal static string CUSTOMER_INVALID_PHONE {
+            get {
+                return ResourceManager.GetString("CUSTOMER_INVALID_PHONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La orden ya se encuentra finalizada y no puede ser modificada. Las órdenes entregadas o canceladas no pueden cambiar de estado..
+        /// </summary>
+        internal static string ORDER_ALREADY_FINALIZED {
+            get {
+                return ResourceManager.GetString("ORDER_ALREADY_FINALIZED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La dirección de facturación no es válida. Debe proporcionar una dirección válida..
+        /// </summary>
+        internal static string ORDER_INVALID_BILLING_ADDRESS {
+            get {
+                return ResourceManager.GetString("ORDER_INVALID_BILLING_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El cliente especificado para la orden no es válido. Verifique que el ID del cliente sea correcto..
+        /// </summary>
+        internal static string ORDER_INVALID_CUSTOMER {
+            get {
+                return ResourceManager.GetString("ORDER_INVALID_CUSTOMER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La dirección de envío no es válida. Debe proporcionar una dirección válida..
+        /// </summary>
+        internal static string ORDER_INVALID_SHIPPING_ADDRESS {
+            get {
+                return ResourceManager.GetString("ORDER_INVALID_SHIPPING_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La transición de estado solicitada no es válida. Verifique el flujo de estados permitido para la orden..
+        /// </summary>
+        internal static string ORDER_INVALID_STATUS_TRANSITION {
+            get {
+                return ResourceManager.GetString("ORDER_INVALID_STATUS_TRANSITION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La orden ya se encuentra en el estado especificado. No es necesario realizar la transición..
+        /// </summary>
+        internal static string ORDER_STATUS_ALREADY_SET {
+            get {
+                return ResourceManager.GetString("ORDER_STATUS_ALREADY_SET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La orden no contiene elementos. Agregue al menos un producto a la orden antes de continuar..
+        /// </summary>
+        internal static string ORDER_WITHOUT_ITEMS {
+            get {
+                return ResourceManager.GetString("ORDER_WITHOUT_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El precio unitario del elemento en la orden no es válido. Debe ser un valor mayor a cero..
+        /// </summary>
+        internal static string ORDERITEM_INVALID_PRICE {
+            get {
+                return ResourceManager.GetString("ORDERITEM_INVALID_PRICE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El producto especificado para el elemento de la orden no es válido. El ID del producto no puede estar vacío..
+        /// </summary>
+        internal static string ORDERITEM_INVALID_PRODUCT {
+            get {
+                return ResourceManager.GetString("ORDERITEM_INVALID_PRODUCT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La cantidad del elemento en la orden no es válida. Debe ser un valor mayor a cero..
+        /// </summary>
+        internal static string ORDERITEM_INVALID_QUANTITY {
+            get {
+                return ResourceManager.GetString("ORDERITEM_INVALID_QUANTITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No se puede realizar operaciones sobre un producto inactivo. Active el producto antes de continuar..
+        /// </summary>
+        internal static string PRODUCT_INACTIVE {
+            get {
+                return ResourceManager.GetString("PRODUCT_INACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stock insuficiente para realizar la operación. La cantidad solicitada excede el inventario disponible..
+        /// </summary>
+        internal static string PRODUCT_INSUFFICIENT_STOCK {
+            get {
+                return ResourceManager.GetString("PRODUCT_INSUFFICIENT_STOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El código interno del producto no es válido. Debe ser un valor no vacío..
+        /// </summary>
+        internal static string PRODUCT_INVALID_INTERNAL_CODE {
+            get {
+                return ResourceManager.GetString("PRODUCT_INVALID_INTERNAL_CODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El nombre del producto no es válido. Debe ser un valor no vacío..
+        /// </summary>
+        internal static string PRODUCT_INVALID_NAME {
+            get {
+                return ResourceManager.GetString("PRODUCT_INVALID_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El precio del producto no es válido. Debe ser un valor mayor a cero..
+        /// </summary>
+        internal static string PRODUCT_INVALID_PRICE {
+            get {
+                return ResourceManager.GetString("PRODUCT_INVALID_PRICE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La cantidad del producto no es válida. Debe ser un valor mayor a cero..
+        /// </summary>
+        internal static string PRODUCT_INVALID_QUANTITY {
+            get {
+                return ResourceManager.GetString("PRODUCT_INVALID_QUANTITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El SKU del producto no es válido. Debe ser un valor no vacío..
+        /// </summary>
+        internal static string PRODUCT_INVALID_SKU {
+            get {
+                return ResourceManager.GetString("PRODUCT_INVALID_SKU", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El stock del producto no es válido. Debe ser un valor mayor o igual a cero..
+        /// </summary>
+        internal static string PRODUCT_INVALID_STOCK {
+            get {
+                return ResourceManager.GetString("PRODUCT_INVALID_STOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El producto solicitado no existe..
+        /// </summary>
+        internal static string PRODUCT_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("PRODUCT_NOT_FOUND", resourceCulture);
+            }
+        }
     }
 }
