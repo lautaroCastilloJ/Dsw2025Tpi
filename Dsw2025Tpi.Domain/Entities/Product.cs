@@ -40,6 +40,20 @@ public sealed class Product : EntityBase
         int stock)
         => new Product(sku, internalCode, name, description, price, stock);
 
+    // --------- Update method ---------
+
+    public void UpdateDetails(string sku, string internalCode, string name, string description, decimal price, int stock)
+    {
+        EnsureActive();
+
+        SetSku(sku);
+        SetInternalCode(internalCode);
+        SetName(name);
+        SetDescription(description);
+        SetPrice(price);
+        SetStock(stock);
+    }
+
     // --------- ---------
 
     public void UpdatePrice(decimal newPrice)

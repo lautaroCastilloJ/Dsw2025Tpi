@@ -138,7 +138,6 @@
   <data name="AUTH_USER_CREATION_FAILED" xml:space="preserve">
     <value>No se pudo crear el usuario. Verifique que el usuario y correo electrónico sean válidos y únicos.</value>
   </data>
-  <!-- Product Exceptions -->
   <data name="PRODUCT_INVALID_SKU" xml:space="preserve">
     <value>El SKU del producto no es válido. Debe ser un valor no vacío.</value>
   </data>
@@ -163,7 +162,6 @@
   <data name="PRODUCT_INACTIVE" xml:space="preserve">
     <value>No se puede realizar operaciones sobre un producto inactivo. Active el producto antes de continuar.</value>
   </data>
-  <!-- Order Exceptions -->
   <data name="ORDER_INVALID_CUSTOMER" xml:space="preserve">
     <value>El cliente especificado para la orden no es válido. Verifique que el ID del cliente sea correcto.</value>
   </data>
@@ -185,7 +183,6 @@
   <data name="ORDER_ALREADY_FINALIZED" xml:space="preserve">
     <value>La orden ya se encuentra finalizada y no puede ser modificada. Las órdenes entregadas o canceladas no pueden cambiar de estado.</value>
   </data>
-  <!-- OrderItem Exceptions -->
   <data name="ORDERITEM_INVALID_PRODUCT" xml:space="preserve">
     <value>El producto especificado para el elemento de la orden no es válido. El ID del producto no puede estar vacío.</value>
   </data>
@@ -194,5 +191,8 @@
   </data>
   <data name="ORDERITEM_INVALID_PRICE" xml:space="preserve">
     <value>El precio unitario del elemento en la orden no es válido. Debe ser un valor mayor a cero.</value>
+  </data>
+  <data name="PRODUCT_NOT_FOUND" xml:space="preserve">
+    <value>El producto solicitado no existe.</value>
   </data>
 </root>

@@ -1,0 +1,12 @@
+﻿using Dsw2025Tpi.Domain.Exceptions.Common;
+
+public sealed class ProductNotFoundException : ExceptionBase
+{
+    public ProductNotFoundException(Guid productId)
+        : base("PRODUCT_NOT_FOUND")
+    {
+        ProductId = productId;
+    }
+
+    public Guid ProductId { get; }
+}
