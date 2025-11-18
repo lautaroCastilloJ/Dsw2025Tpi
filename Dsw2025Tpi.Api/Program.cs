@@ -1,5 +1,7 @@
-
 using Dsw2025Tpi.Api.Middlewares;
+using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Application.Mappings;
+using Dsw2025Tpi.Application.Services;
 
 namespace Dsw2025Tpi.Api;
 
@@ -16,6 +18,14 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
+
+        // Servicios personalizados de la aplicación
+        builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+
+
+        // Add AutoMapper
+        builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
         var app = builder.Build();
 

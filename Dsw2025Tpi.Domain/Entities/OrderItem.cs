@@ -9,7 +9,9 @@ public sealed class OrderItem : EntityBase
     public decimal UnitPrice { get; private set; }
     public decimal Subtotal => Quantity * UnitPrice; // El backend calcula el Subtotal en base a Quantity y UnitPrice, por lo tanto no tiene setter ya que es calculo derivado.
     public Guid OrderId { get; private set; } // Foreign Key
-    public Guid ProductId { get; private set; } // Foreign Key 
+    public Guid ProductId { get; private set; } // Foreign Key
+    public string ProductName { get; private set; } // Nombre del producto
+    public Order? Order { get; private set; } // Propiedad de navegación
 
     private OrderItem() { } // for EF
 

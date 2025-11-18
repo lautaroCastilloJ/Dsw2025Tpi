@@ -1,6 +1,6 @@
 ﻿
 
-namespace Dsw2025Tpi.Application.Dtos.Product;
+namespace Dsw2025Tpi.Application.Dtos.Products;
 
 public record FilterProductRequest(
     string? Status,

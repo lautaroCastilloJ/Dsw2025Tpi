@@ -1,5 +1,4 @@
-﻿using Dsw2025Tpi.Application.Dtos.Product;
-using Dsw2025Tpi.Application.Dtos.Products;
+﻿using Dsw2025Tpi.Application.Dtos.Products;
 using Dsw2025Tpi.Application.Pagination;
 
 namespace Dsw2025Tpi.Application.Interfaces;

@@ -132,4 +132,67 @@
   <data name="CUSTOMER_ALREADY_INACTIVE" xml:space="preserve">
     <value>El cliente ya se encuentra inactivo.</value>
   </data>
+  <data name="AUTH_INVALID_CREDENTIALS" xml:space="preserve">
+    <value>Las credenciales ingresadas son inválidas. Verifique su usuario y contraseña.</value>
+  </data>
+  <data name="AUTH_USER_CREATION_FAILED" xml:space="preserve">
+    <value>No se pudo crear el usuario. Verifique que el usuario y correo electrónico sean válidos y únicos.</value>
+  </data>
+  <!-- Product Exceptions -->
+  <data name="PRODUCT_INVALID_SKU" xml:space="preserve">
+    <value>El SKU del producto no es válido. Debe ser un valor no vacío.</value>
+  </data>
+  <data name="PRODUCT_INVALID_INTERNAL_CODE" xml:space="preserve">
+    <value>El código interno del producto no es válido. Debe ser un valor no vacío.</value>
+  </data>
+  <data name="PRODUCT_INVALID_NAME" xml:space="preserve">
+    <value>El nombre del producto no es válido. Debe ser un valor no vacío.</value>
+  </data>
+  <data name="PRODUCT_INVALID_PRICE" xml:space="preserve">
+    <value>El precio del producto no es válido. Debe ser un valor mayor a cero.</value>
+  </data>
+  <data name="PRODUCT_INVALID_QUANTITY" xml:space="preserve">
+    <value>La cantidad del producto no es válida. Debe ser un valor mayor a cero.</value>
+  </data>
+  <data name="PRODUCT_INVALID_STOCK" xml:space="preserve">
+    <value>El stock del producto no es válido. Debe ser un valor mayor o igual a cero.</value>
+  </data>
+  <data name="PRODUCT_INSUFFICIENT_STOCK" xml:space="preserve">
+    <value>Stock insuficiente para realizar la operación. La cantidad solicitada excede el inventario disponible.</value>
+  </data>
+  <data name="PRODUCT_INACTIVE" xml:space="preserve">
+    <value>No se puede realizar operaciones sobre un producto inactivo. Active el producto antes de continuar.</value>
+  </data>
+  <!-- Order Exceptions -->
+  <data name="ORDER_INVALID_CUSTOMER" xml:space="preserve">
+    <value>El cliente especificado para la orden no es válido. Verifique que el ID del cliente sea correcto.</value>
+  </data>
+  <data name="ORDER_INVALID_SHIPPING_ADDRESS" xml:space="preserve">
+    <value>La dirección de envío no es válida. Debe proporcionar una dirección válida.</value>
+  </data>
+  <data name="ORDER_INVALID_BILLING_ADDRESS" xml:space="preserve">
+    <value>La dirección de facturación no es válida. Debe proporcionar una dirección válida.</value>
+  </data>
+  <data name="ORDER_WITHOUT_ITEMS" xml:space="preserve">
+    <value>La orden no contiene elementos. Agregue al menos un producto a la orden antes de continuar.</value>
+  </data>
+  <data name="ORDER_STATUS_ALREADY_SET" xml:space="preserve">
+    <value>La orden ya se encuentra en el estado especificado. No es necesario realizar la transición.</value>
+  </data>
+  <data name="ORDER_INVALID_STATUS_TRANSITION" xml:space="preserve">
+    <value>La transición de estado solicitada no es válida. Verifique el flujo de estados permitido para la orden.</value>
+  </data>
+  <data name="ORDER_ALREADY_FINALIZED" xml:space="preserve">
+    <value>La orden ya se encuentra finalizada y no puede ser modificada. Las órdenes entregadas o canceladas no pueden cambiar de estado.</value>
+  </data>
+  <!-- OrderItem Exceptions -->
+  <data name="ORDERITEM_INVALID_PRODUCT" xml:space="preserve">
+    <value>El producto especificado para el elemento de la orden no es válido. El ID del producto no puede estar vacío.</value>
+  </data>
+  <data name="ORDERITEM_INVALID_QUANTITY" xml:space="preserve">
+    <value>La cantidad del elemento en la orden no es válida. Debe ser un valor mayor a cero.</value>
+  </data>
+  <data name="ORDERITEM_INVALID_PRICE" xml:space="preserve">
+    <value>El precio unitario del elemento en la orden no es válido. Debe ser un valor mayor a cero.</value>
+  </data>
 </root>
