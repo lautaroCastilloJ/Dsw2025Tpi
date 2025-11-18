@@ -96,53 +96,80 @@ public sealed class ProductService : IProductService
 
     // 6) Paginación de productos → GET /api/products/paged?...
     public Task<PagedResult<ProductListItemDto>> GetPagedAsync(
-        FilterProductRequest filter,
-        CancellationToken cancellationToken = default)
+           FilterProductRequest filter,
+           CancellationToken cancellationToken = default)
     {
+        // 1) Query base
         var query = _productRepository.GetAllQueryable();
 
-        // Filtro por estado
+        // 2) Filtro por estado (activo / inactivo)
         if (!string.IsNullOrWhiteSpace(filter.Status))
         {
             var status = filter.Status.Trim().ToLowerInvariant();
-            if (status is "active" or "true")
-                query = query.Where(p => p.IsActive);
-            else if (status is "inactive" or "false")
-                query = query.Where(p => !p.IsActive);
+
+            query = status switch
+            {
+                "enabled" or "active" or "true" => query.Where(p => p.IsActive),
+                "disabled" or "inactive" or "false" => query.Where(p => !p.IsActive),
+                _ => query // valor inválido: no filtramos
+            };
         }
 
-        // Búsqueda por texto (SKU / Name)
+        // 3) Filtro de búsqueda (SKU / Nombre)
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var term = filter.Search.Trim();
+
             query = query.Where(p =>
                 p.Sku.Contains(term) ||
                 p.Name.Contains(term));
         }
 
-        // Normalizar paginación
-        var pageNumber = filter.PageNumber.HasValue && filter.PageNumber > 0 ? filter.PageNumber.Value : 1;
-        var pageSize = filter.PageSize.HasValue && filter.PageSize > 0 ? filter.PageSize.Value : 10;
-        if (pageSize > 100) pageSize = 100;
+        // 4) Normalizar paginación
+        int pageNumber = (filter.PageNumber.HasValue && filter.PageNumber > 0) ? filter.PageNumber.Value : 1;
+        int pageSize = (filter.PageSize.HasValue && filter.PageSize > 0) ? filter.PageSize.Value : 10;
 
+        const int maxPageSize = 100;
+        if (pageSize > maxPageSize)
+            pageSize = maxPageSize;
+
+        // 5) Total antes de paginar
         var totalCount = query.Count();
 
+        if (totalCount == 0)
+        {
+            var empty = PagedResult<ProductListItemDto>.Create(
+                Array.Empty<ProductListItemDto>(),
+                0,
+                pageNumber,
+                pageSize);
+
+            return Task.FromResult(empty);
+        }
+
+        // 6) Paginación + proyección a DTO liviano
         var items = query
-            .OrderBy(p => p.Name)
+            .OrderBy(p => p.Sku) // criterio estable
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
-
-        var dtoItems = items
-            .Select(p => _mapper.Map<ProductListItemDto>(p))
+            .Select(p => new ProductListItemDto
+            {
+                Id = p.Id,
+                Sku = p.Sku,
+                Name = p.Name,
+                CurrentUnitPrice = p.CurrentUnitPrice,
+                IsActive = p.IsActive
+            })
             .ToList();
 
         var result = PagedResult<ProductListItemDto>.Create(
-            dtoItems,
+            items,
             totalCount,
             pageNumber,
             pageSize);
 
-        return Task.FromResult(result); // No es async porque todo se ejecuta en memoria
+        return Task.FromResult(result);
     }
 }
+
+

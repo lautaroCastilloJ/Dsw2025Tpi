@@ -40,7 +40,7 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 
         // Si quisieras limitar a ciertos roles:
         RuleFor(x => x.Role)
-             .Must(role => new[] { "Admin", "Customer" }.Contains(role))
+             .Must(role => new[] { "Administrador", "Cliente" }.Contains(role))
              .When(x => !string.IsNullOrWhiteSpace(x.Role))
              .WithMessage("El rol especificado no es válido.");
     }

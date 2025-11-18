@@ -50,8 +50,8 @@ public class UserService : IUserService
 
             userId = user.Id;
 
-            // Asignar rol
-            var role = string.IsNullOrWhiteSpace(request.Role) ? "Cliente" : request.Role;
+            // Asignar rol (usar AppRoles para consistencia)
+            var role = string.IsNullOrWhiteSpace(request.Role) ? AppRoles.Cliente : request.Role;
             var roleResult = await _userManager.AddToRoleAsync(user, role);
             if (!roleResult.Succeeded)
             {
@@ -60,7 +60,7 @@ public class UserService : IUserService
             }
 
             // 2. Crear Customer vinculado al AppUser (solo para clientes)
-            if (role.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
+            if (role.Equals(AppRoles.Cliente, StringComparison.OrdinalIgnoreCase))
             {
                 var customer = Customer.Create(
                     request.Email,
@@ -95,7 +95,7 @@ public class UserService : IUserService
             throw new InvalidCredentialsException();
 
         var roles = await _userManager.GetRolesAsync(user);
-        var userRole = roles.FirstOrDefault() ?? "Cliente";
+        var userRole = roles.FirstOrDefault() ?? AppRoles.Cliente;
 
         return (request.Username, userRole);
     }
