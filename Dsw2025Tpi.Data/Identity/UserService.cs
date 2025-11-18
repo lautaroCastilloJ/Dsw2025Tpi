@@ -3,7 +3,6 @@ using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Dsw2025Tpi.Data.Identity;
 
-
 namespace Dsw2025Tpi.Data.Identity;
 
 public class UserService : IUserService
