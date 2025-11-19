@@ -13,6 +13,5 @@ public record ProductResponse(
     string Name,
     string? Description,
     decimal CurrentUnitPrice,
-    int StockQuantity,
-    bool IsActive
+    int StockQuantity
 );

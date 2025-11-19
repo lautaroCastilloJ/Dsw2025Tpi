@@ -17,7 +17,7 @@ public class JwtTokenService : IJwtTokenService
         _config = config;
     }
 
-    public string GenerateToken(string username, string role)
+    public string GenerateToken(string username, string role, Guid? customerId = null)
     {
         var jwtConfig = _config.GetSection("Jwt");
 
@@ -28,17 +28,23 @@ public class JwtTokenService : IJwtTokenService
         double.TryParse(jwtConfig["ExpireInMinutes"], out var expireMinutes);
         expireMinutes = expireMinutes > 0 ? expireMinutes : 60;
 
-        var claims = new[]
+        var claimsList = new List<Claim>
         {
-        new Claim(JwtRegisteredClaimNames.Sub, username),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(ClaimTypes.Role, role)
-    };
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, role)
+        };
+
+        // Agregar customerId si está presente (solo para clientes)
+        if (customerId.HasValue && customerId.Value != Guid.Empty)
+        {
+            claimsList.Add(new Claim("customerId", customerId.Value.ToString()));
+        }
 
         var token = new JwtSecurityToken(
             issuer: jwtConfig["Issuer"],
             audience: jwtConfig["Audience"],
-            claims: claims,
+            claims: claimsList,
             expires: DateTime.UtcNow.AddMinutes(expireMinutes),
             signingCredentials: creds
         );

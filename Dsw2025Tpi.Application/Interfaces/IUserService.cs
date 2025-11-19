@@ -6,5 +6,5 @@ namespace Dsw2025Tpi.Application.Interfaces;
 public interface IUserService
 {
     Task<string> RegisterAsync(RegisterRequest request);
-    Task<(string Username, string Role)> LoginAsync(LoginRequest request);
+    Task<(string Username, string Role, Guid? CustomerId)> LoginAsync(LoginRequest request);
 }

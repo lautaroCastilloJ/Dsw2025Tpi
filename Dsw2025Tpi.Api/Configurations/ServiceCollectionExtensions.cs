@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IOrderService, OrderService>();
 
         // ========= Repository & UnitOfWork =========
         services.AddScoped<IUnitOfWork, UnitOfWork>();

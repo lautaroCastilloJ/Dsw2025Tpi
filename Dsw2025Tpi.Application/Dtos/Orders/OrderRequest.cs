@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Dtos.Orders;
 
-public record OrderRequest(
-    Guid CustomerId,
+public sealed record OrderRequest(
     string ShippingAddress,
     string BillingAddress,
     string? Notes,
-    List<OrderItemRequest> OrderItems
+    IEnumerable<OrderItemRequest> OrderItems
 );

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
 
@@ -57,6 +58,9 @@ public class Program
                     Array.Empty<string>()
                 }
             });
+            
+            // Add support for examples
+            o.ExampleFilters();
         });
 
         builder.Services.AddHealthChecks();
@@ -108,14 +112,18 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<OrderItemRequestValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<UpdateOrderStatusRequestValidator>();
 
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddFluentValidationClientsideAdapters();
 
         builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 
-
         builder.Services.AddAutoMapper(typeof(Dsw2025Tpi.Application.Mappings.MappingProfiles));
+
+        // Register Swagger examples
+        builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
+
 
         builder.Services.AddAuthorization();
         builder.Services.AddCors(options =>

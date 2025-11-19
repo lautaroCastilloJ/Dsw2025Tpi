@@ -133,6 +133,15 @@ namespace Dsw2025Tpi.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stock insuficiente para completar la orden..
+        /// </summary>
+        internal static string ORDER_INSUFFICIENT_STOCK {
+            get {
+                return ResourceManager.GetString("ORDER_INSUFFICIENT_STOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to La dirección de facturación no es válida. Debe proporcionar una dirección válida..
         /// </summary>
         internal static string ORDER_INVALID_BILLING_ADDRESS {
@@ -160,11 +169,29 @@ namespace Dsw2025Tpi.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to El estado de la orden proporcionado no es válido. Estados válidos: Pending, Processing, Shipped, Delivered, Cancelled..
+        /// </summary>
+        internal static string ORDER_INVALID_STATUS {
+            get {
+                return ResourceManager.GetString("ORDER_INVALID_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to La transición de estado solicitada no es válida. Verifique el flujo de estados permitido para la orden..
         /// </summary>
         internal static string ORDER_INVALID_STATUS_TRANSITION {
             get {
                 return ResourceManager.GetString("ORDER_INVALID_STATUS_TRANSITION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La orden solicitada no existe..
+        /// </summary>
+        internal static string ORDER_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("ORDER_NOT_FOUND", resourceCulture);
             }
         }
         
@@ -205,11 +232,29 @@ namespace Dsw2025Tpi.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to El nombre del producto es obligatorio para registrar el ítem de la orden..
+        /// </summary>
+        internal static string ORDERITEM_INVALID_PRODUCT_NAME {
+            get {
+                return ResourceManager.GetString("ORDERITEM_INVALID_PRODUCT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to La cantidad del elemento en la orden no es válida. Debe ser un valor mayor a cero..
         /// </summary>
         internal static string ORDERITEM_INVALID_QUANTITY {
             get {
                 return ResourceManager.GetString("ORDERITEM_INVALID_QUANTITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ya existe un producto con {0} &apos;{1}&apos;..
+        /// </summary>
+        internal static string PRODUCT_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("PRODUCT_ALREADY_EXISTS", resourceCulture);
             }
         }
         

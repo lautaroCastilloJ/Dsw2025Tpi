@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Dtos.Products;
 
-public sealed class ProductListItemDto
-{
-    public Guid Id { get; init; }
-    public string Sku { get; init; } = default!;
-    public string Name { get; init; } = default!;
-    public decimal CurrentUnitPrice { get; init; }
-    public bool IsActive { get; init; }
-}
+public sealed record ProductListItemDto(
+    Guid Id,
+    string Sku,
+    string Name,
+    decimal CurrentUnitPrice,
+    bool IsActive);

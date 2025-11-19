@@ -82,7 +82,7 @@ public class UserService : IUserService
         return userId;
     }
 
-    public async Task<(string Username, string Role)> LoginAsync(LoginRequest request)
+    public async Task<(string Username, string Role, Guid? CustomerId)> LoginAsync(LoginRequest request)
     {
         ValidateLoginRequest(request);
 
@@ -99,7 +99,7 @@ public class UserService : IUserService
         var roles = await _userManager.GetRolesAsync(user);
         var userRole = roles.FirstOrDefault() ?? AppRoles.Cliente;
 
-        return (request.Username, userRole);
+        return (request.Username, userRole, user.CustomerId);
     }
 
     private static void ValidateLoginRequest(LoginRequest request)

@@ -11,13 +11,10 @@ public sealed class UpdateOrderStatusRequestValidator : AbstractValidator<Update
 
     public UpdateOrderStatusRequestValidator()
     {
-        RuleFor(x => x.OrderId)
-            .NotEmpty().WithMessage("El identificador de la orden es obligatorio.");
-
         RuleFor(x => x.NewStatus)
             .NotEmpty().WithMessage("El nuevo estado es obligatorio.")
             .Must(BeValidStatus)
-            .WithMessage("El estado especificado no es válido.");
+            .WithMessage($"El estado especificado no es válido. Estados válidos: {string.Join(", ", AllowedStatuses)}");
     }
 
     private static bool BeValidStatus(string newStatus)

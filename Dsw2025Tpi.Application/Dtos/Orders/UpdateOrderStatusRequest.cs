@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Dtos.Orders;
 
-public record UpdateOrderStatusRequest(
-    Guid OrderId,
+public sealed record UpdateOrderStatusRequest(
     string NewStatus
 );
