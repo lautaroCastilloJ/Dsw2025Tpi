@@ -28,5 +28,10 @@ public class MappingProfiles : Profile
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items.ToList()));
 
         CreateMap<OrderItem, OrderItemResponse>();
+
+        // OrderListItemDto mapping
+        CreateMap<Order, OrderListItemDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount));
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Dsw2025Tpi.Api.Examples;
 using Dsw2025Tpi.Application.Dtos.Orders;
 using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Data.Identity;
 using Dsw2025Tpi.Domain.Exceptions.OrderExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
+using System.Security.Claims;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
@@ -19,8 +21,14 @@ public class OrdersController : ControllerBase
         _orderService = orderService;
     }
 
+
+    // ----------------------------------------------------------------------
+    // 6. Crear una nueva orden: POST /api/orders 
+    // Solo rol Cliente puede crear órdenes
+    // ----------------------------------------------------------------------
     [HttpPost]
-    [Authorize(Roles = "Cliente")] // SOLO clientes pueden crear órdenes
+    [Authorize(Roles = AppRoles.Cliente)]
+    [SwaggerRequestExample(typeof(OrderRequest), typeof(OrderRequestExample))]
     public async Task<IActionResult> Create([FromBody] OrderRequest request)
     {
         // 1) Obtener CustomerId del token
@@ -41,11 +49,52 @@ public class OrdersController : ControllerBase
         );
     }
 
+    // ----------------------------------------------------------------------
+    // 7. Obtener orden por ID: GET /api/orders/{id}
+    // ----------------------------------------------------------------------
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "Cliente")]
+    [Authorize(Roles = $"{AppRoles.Cliente},{AppRoles.Administrador}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _orderService.GetOrderByIdAsync(id);
         return Ok(result);
+    }
+
+    // ----------------------------------------------------------------------
+    // 8. Obtener mis órdenes (Cliente): GET /api/orders/my-orders
+    // Solo puede ver sus propias órdenes, customerId viene del token
+    // ----------------------------------------------------------------------
+    [HttpGet("my-orders")]
+    [Authorize(Roles = AppRoles.Cliente)]
+    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetMyOrders(
+        [FromQuery] string? status,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        // Obtener customerId del token
+        var customerIdClaim = User.FindFirst("customerId")?.Value;
+        if (!Guid.TryParse(customerIdClaim, out var customerId) || customerId == Guid.Empty)
+            return Unauthorized(new { error = "No se pudo resolver el cliente desde el token." });
+
+        var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
+
+        return Ok(orders);
+    }
+
+    // ----------------------------------------------------------------------
+    // 9. Obtener todas las órdenes (Administrador): GET /api/orders
+    // Puede filtrar por customerId, status, con paginación
+    // ----------------------------------------------------------------------
+    [HttpGet("admin")]
+    [Authorize(Roles = AppRoles.Administrador)]
+    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetAll(
+        [FromQuery] string? status,
+        [FromQuery] Guid? customerId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
+
+        return Ok(orders);
     }
 }

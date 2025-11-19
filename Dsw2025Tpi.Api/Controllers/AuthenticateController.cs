@@ -23,14 +23,15 @@ public class AuthenticateController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var (username, role) = await _userService.LoginAsync(request);
+        var (username, role, customerId) = await _userService.LoginAsync(request);
 
-        var token = _jwtTokenService.GenerateToken(username, role);
+        var token = _jwtTokenService.GenerateToken(username, role, customerId);
 
         return Ok(new
         {
             token,
-            role
+            role,
+            customerId
         });
     }
 
