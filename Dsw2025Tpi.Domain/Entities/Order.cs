@@ -46,22 +46,20 @@ public sealed class Order : EntityBase
 
     // --- comportamiento de la orden ---
 
-    public void AddItem(Guid productId, int quantity, decimal unitPrice)
+    public void AddItem(Guid productId, string productName, int quantity, decimal unitPrice)
     {
         EnsureModifiable();
-
-        // Puedes decidir si quieres agrupar por producto (sumar cantidades)
         var existing = _items.FirstOrDefault(i => i.ProductId == productId);
         if (existing is not null)
         {
             existing.ChangeQuantity(existing.Quantity + quantity);
+            return;
         }
-        else
-        {
-            var item = OrderItem.Create(productId, quantity, unitPrice);
-            _items.Add(item);
-        }
+
+        var item = OrderItem.Create(productId, productName, quantity, unitPrice);
+        _items.Add(item);
     }
+
 
     public void RemoveItem(Guid orderItemId)
     {

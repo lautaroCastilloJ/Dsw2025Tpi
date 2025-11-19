@@ -22,8 +22,11 @@ public class MappingProfiles : Profile
                 src.StockQuantity
             ));
 
-        // Order (solo lectura)
-        CreateMap<Order, OrderResponse>();
+        // Order with custom mapping
+        CreateMap<Order, OrderResponse>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items.ToList()));
+
         CreateMap<OrderItem, OrderItemResponse>();
     }
 }

@@ -29,6 +29,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.Property(o => o.OrderId)
             .IsRequired();
 
+        // Configure the relationship with Order
         builder.HasOne(o => o.Order)
             .WithMany(o => o.Items)
             .HasForeignKey(o => o.OrderId)
