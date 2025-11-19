@@ -31,17 +31,50 @@ public sealed class ProductService : IProductService
         return _mapper.Map<ProductResponse>(product);
     }
 
-    // 2) Obtener todos los productos → GET /api/products
-    //    El controller decidirá si devuelve 200 OK o 204 NoContent
-    public async Task<IEnumerable<ProductResponse>> GetAllAsync()
+    // 2) Obtener todos los productos activos con paginación → GET /api/products
+    public async Task<PagedResult<ProductResponse>> GetAllAsync(int pageNumber = 1, int pageSize = 10)
     {
-        var products = await _productRepository.GetAll();
+        var query = _productRepository.GetAllQueryable();
 
-        if (products is null || !products.Any())
-            return Enumerable.Empty<ProductResponse>();
+        // Filtrar solo productos activos
+        query = query.Where(p => p.IsActive);
 
-        return products.Select(p => _mapper.Map<ProductResponse>(p))
-                       .ToList();
+        // Normalizar paginación
+        if (pageNumber <= 0) pageNumber = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        const int maxPageSize = 100;
+        if (pageSize > maxPageSize)
+            pageSize = maxPageSize;
+
+        // Total antes de paginar
+        var totalCount = query.Count();
+
+        if (totalCount == 0)
+        {
+            return PagedResult<ProductResponse>.Create(
+                new List<ProductResponse>(),
+                0,
+                pageNumber,
+                pageSize);
+        }
+
+        // Paginación + proyección a DTO
+        var items = query
+            .OrderBy(p => p.Sku) // criterio estable
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var dtoItems = items
+            .Select(p => _mapper.Map<ProductResponse>(p))
+            .ToList();
+
+        return PagedResult<ProductResponse>.Create(
+            dtoItems,
+            totalCount,
+            pageNumber,
+            pageSize);
     }
 
     // 3) Obtener producto por Id → GET /api/products/{id}
