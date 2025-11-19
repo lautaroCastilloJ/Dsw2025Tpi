@@ -195,4 +195,7 @@
   <data name="PRODUCT_NOT_FOUND" xml:space="preserve">
     <value>El producto solicitado no existe.</value>
   </data>
+  <data name="PRODUCT_ALREADY_EXISTS" xml:space="preserve">
+    <value>Ya existe un producto con {0} '{1}'.</value>
+  </data>
 </root>

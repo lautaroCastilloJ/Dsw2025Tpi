@@ -214,6 +214,15 @@ namespace Dsw2025Tpi.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ya existe un producto con {0} &apos;{1}&apos;..
+        /// </summary>
+        internal static string PRODUCT_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("PRODUCT_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No se puede realizar operaciones sobre un producto inactivo. Active el producto antes de continuar..
         /// </summary>
         internal static string PRODUCT_INACTIVE {

@@ -18,6 +18,12 @@ public abstract class ExceptionBase : Exception
         Code = code;
     }
 
+    protected ExceptionBase(string code, string? customMessage)
+        : base(customMessage ?? GetMessageFromResource(code))
+    {
+        Code = code;
+    }
+
     private static string GetMessageFromResource(string code)
     {
         // Convertir dots "PRODUCT.INVALID_PRICE" a underscore si tu resx lo requiere
