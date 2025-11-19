@@ -7,7 +7,8 @@ public sealed class InvalidOrderStatusException : ExceptionBase
     public string Status { get; }
 
     public InvalidOrderStatusException(string status)
-        : base("ORDER_INVALID_STATUS")
+        : base("ORDER_INVALID_STATUS", 
+            $"El estado '{status}' no es válido. Estados válidos: Pending, Processing, Shipped, Delivered, Cancelled.")
     {
         Status = status;
     }

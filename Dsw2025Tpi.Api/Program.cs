@@ -112,6 +112,7 @@ public class Program
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<OrderItemRequestValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<UpdateOrderStatusRequestValidator>();
 
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddFluentValidationClientsideAdapters();

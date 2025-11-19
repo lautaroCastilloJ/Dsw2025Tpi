@@ -172,7 +172,7 @@ public sealed class OrderService : IOrderService
     // ===========================================================
     public async Task<OrderResponse> UpdateOrderStatusAsync(Guid id, string newStatus)
     {
-        var order = await _orderRepository.GetById(id);
+        var order = await _orderRepository.GetById(id, "Items"); // Include Items para TotalAmount
         if (order is null)
             throw new OrderNotFoundException(id);
 

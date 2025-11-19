@@ -82,7 +82,7 @@ public class OrdersController : ControllerBase
     }
 
     // ----------------------------------------------------------------------
-    // 9. Obtener todas las órdenes (Administrador): GET /api/orders
+    // 9. Obtener todas las órdenes (Administrador): GET /api/orders/admin
     // Puede filtrar por customerId, status, con paginación
     // ----------------------------------------------------------------------
     [HttpGet("admin")]
@@ -96,5 +96,20 @@ public class OrdersController : ControllerBase
         var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
 
         return Ok(orders);
+    }
+
+    // ----------------------------------------------------------------------
+    // 10. Actualizar estado de orden (Administrador): PUT /api/orders/{id}/status
+    // Solo administradores pueden cambiar el estado de una orden
+    // ----------------------------------------------------------------------
+    [HttpPut("{id:guid}/status")]
+    [Authorize(Roles = AppRoles.Administrador)]
+    public async Task<IActionResult> UpdateStatus(
+        Guid id,
+        [FromBody] UpdateOrderStatusRequest request)
+    {
+        var updated = await _orderService.UpdateOrderStatusAsync(id, request.NewStatus);
+
+        return Ok(updated);
     }
 }
