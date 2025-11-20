@@ -1,4 +1,5 @@
 using Dsw2025Tpi.Domain.Exceptions.Common;
+using System.Text.Json;
 
 namespace Dsw2025Tpi.Api.Middlewares;
 
@@ -6,11 +7,16 @@ public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly IHostEnvironment _env;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public ExceptionMiddleware(
+        RequestDelegate next, 
+        ILogger<ExceptionMiddleware> logger,
+        IHostEnvironment env)
     {
         _next = next;
         _logger = logger;
+        _env = env;
     }
 
     public async Task Invoke(HttpContext context)
@@ -21,33 +27,61 @@ public class ExceptionMiddleware
         }
         catch (ExceptionBase ex)
         {
-            _logger.LogWarning(ex, "Domain exception captured ({Code})", ex.Code);
-
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "application/json";
-
-            await context.Response.WriteAsJsonAsync(new
-            {
-                code = ex.Code,
-                message = ex.Message,
-                status = 400,
-                traceId = context.TraceIdentifier
-            });
+            _logger.LogWarning(ex, "Domain exception captured: {Code} - {Message}", ex.Code, ex.Message);
+            await HandleExceptionAsync(context, ex, StatusCodes.Status400BadRequest);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled server error");
+            _logger.LogError(ex, "Unhandled server error: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex, StatusCodes.Status500InternalServerError);
+        }
+    }
 
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception, int statusCode)
+    {
+        // Check if response has already started
+        if (context.Response.HasStarted)
+        {
+            _logger.LogWarning("Cannot write exception response. Response has already started.");
+            return;
+        }
 
-            await context.Response.WriteAsJsonAsync(new
+        context.Response.Clear();
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
+
+        object response;
+        
+        if (exception is ExceptionBase domainEx)
+        {
+            response = new
+            {
+                code = domainEx.Code,
+                message = domainEx.Message,
+                status = statusCode,
+                traceId = context.TraceIdentifier
+            };
+        }
+        else
+        {
+            response = new
             {
                 code = "UNEXPECTED_ERROR",
-                message = "An unexpected error occurred.",
-                status = 500,
-                traceId = context.TraceIdentifier
-            });
+                message = _env.IsDevelopment() 
+                    ? exception.Message 
+                    : "An unexpected error occurred.",
+                status = statusCode,
+                traceId = context.TraceIdentifier,
+                details = _env.IsDevelopment() ? exception.StackTrace : null
+            };
         }
+
+        var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = _env.IsDevelopment()
+        });
+
+        await context.Response.WriteAsync(jsonResponse);
     }
 }

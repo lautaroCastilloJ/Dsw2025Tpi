@@ -1,11 +1,10 @@
 using Dsw2025Tpi.Api.Configurations;
 using Dsw2025Tpi.Api.Middlewares;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Application.Validators;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Identity;
-using Dsw2025Tpi.Data.Repositories;
-using Dsw2025Tpi.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,7 +25,6 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
         builder.Services.AddControllers();
       
         builder.Services.AddEndpointsApiExplorer();
@@ -59,23 +57,28 @@ public class Program
                 }
             });
             
-            // Add support for examples
             o.ExampleFilters();
         });
 
         builder.Services.AddHealthChecks();
 
+        // ========= Identity Configuration =========
         builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
         {
             options.Password = new PasswordOptions
             {
-                RequiredLength = 8
+                RequiredLength = 8,
+                RequireDigit = true,
+                RequireLowercase = true,
+                RequireUppercase = true,
+                RequireNonAlphanumeric = true,
+                RequiredUniqueChars = 1
             };
-
         })
         .AddEntityFrameworkStores<AuthenticateContext>()
         .AddDefaultTokenProviders();
 
+        // ========= JWT Configuration =========
         var jwtConfig = builder.Configuration.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("JWT Key");
         var key = Encoding.UTF8.GetBytes(keyText);
@@ -85,10 +88,10 @@ public class Program
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-            .AddJwtBearer(options =>
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
@@ -96,17 +99,20 @@ public class Program
                 ValidIssuer = jwtConfig["Issuer"],
                 ValidAudience = jwtConfig["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
+            };
+        });
 
-
-        builder.Services.AddDomainServices(builder.Configuration);
+        // ========= Database Context =========
         builder.Services.AddDbContext<AuthenticateContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
-        builder.Services.AddSingleton<JwtTokenService>();
+        // ========= Application Services (includes Repository, UnitOfWork, etc.) =========
+        builder.Services.AddDomainServices(builder.Configuration);
+
+        // ========= JWT Token Service =========
+        builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         // ========= FluentValidation =========
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
@@ -117,21 +123,23 @@ public class Program
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddFluentValidationClientsideAdapters();
 
-        builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-
+        // ========= AutoMapper =========
         builder.Services.AddAutoMapper(typeof(Dsw2025Tpi.Application.Mappings.MappingProfiles));
 
-        // Register Swagger examples
+        // ========= Swagger Examples =========
         builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 
-
+        // ========= Authorization =========
         builder.Services.AddAuthorization();
+        
+        // ========= CORS Configuration =========
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("PermitirFrontend", policy =>
-                policy.WithOrigins("http://localhost:3000")
+                policy.WithOrigins("http://localhost:5173")
                       .AllowAnyHeader()
-                      .AllowAnyMethod());
+                      .AllowAnyMethod()
+                      .AllowCredentials());
         });
 
         var app = builder.Build();
@@ -143,11 +151,10 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        // ========= Middleware Pipeline =========
         app.UseMiddleware<ExceptionMiddleware>();
         app.UseHttpsRedirection();
-
         app.UseCors("PermitirFrontend");
-
         app.UseAuthentication();
         app.UseAuthorization();
 
