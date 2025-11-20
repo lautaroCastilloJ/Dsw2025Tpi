@@ -46,10 +46,7 @@ public class ProductsController : ControllerBase
     {
         var paged = await _productService.GetAllAsync(pageNumber, pageSize);
 
-        if (!paged.Items.Any())
-            return NoContent();                // 204 si no hay productos
-
-        return Ok(paged);                     // 200 con PagedResult<ProductResponse>
+        return Ok(paged);  // Siempre retorna 200 con PagedResult, aunque items esté vacío
     }
 
 
@@ -106,9 +103,6 @@ public class ProductsController : ControllerBase
     {
         var paged = await _productService.GetPagedAsync(filter, cancellationToken);
 
-        if (!paged.Items.Any())
-            return NoContent();               // 204
-
-        return Ok(paged);                     // 200 con PagedResult<ProductListItemDto>
+        return Ok(paged);  // Siempre retorna 200 con PagedResult, aunque items esté vacío
     }
 }

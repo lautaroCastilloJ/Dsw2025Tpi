@@ -14,7 +14,7 @@ public class AuthenticateController : ControllerBase
     private readonly ILogger<AuthenticateController> _logger;
 
     public AuthenticateController(
-        IUserService userService, 
+        IUserService userService,
         IJwtTokenService jwtTokenService,
         ILogger<AuthenticateController> logger)
     {
@@ -23,51 +23,43 @@ public class AuthenticateController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Authenticate user and generate JWT token
-    /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Login attempt for user: {Username}", request.Username);
+        _logger.LogInformation("Intento de inicio de sesión para el usuario: {Username}", request.Username);
 
         var (username, role, customerId) = await _userService.LoginAsync(request, cancellationToken);
 
         var token = _jwtTokenService.GenerateToken(username, role, customerId);
         
-        _logger.LogInformation("Login successful for user: {Username}, Role: {Role}", username, role);
+        _logger.LogInformation("Inicio de sesión exitoso para el usuario: {Username}, Rol: {Role}", username, role);
 
         return Ok(new 
         { 
             token,
-            username,
             role,
             customerId
         });
     }
 
-    /// <summary>
-    /// Register a new user
-    /// </summary>
     [HttpPost("register")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Registration attempt for user: {Username}, Email: {Email}", request.UserName, request.Email);
+        _logger.LogInformation("Intento de registro para el usuario: {Username}, Email: {Email}", request.UserName, request.Email);
 
         var userId = await _userService.RegisterAsync(request, cancellationToken);
 
-        _logger.LogInformation("User registered successfully with ID: {UserId}", userId);
+        _logger.LogInformation("Usuario registrado exitosamente con ID: {UserId}", userId);
 
         return Ok(new
         {
-            userId,
-            message = "Usuario registrado correctamente."
+            userId
         });
     }
 }
