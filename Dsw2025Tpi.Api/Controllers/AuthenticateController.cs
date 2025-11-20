@@ -11,37 +11,58 @@ public class AuthenticateController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly ILogger<AuthenticateController> _logger;
 
-    public AuthenticateController(IUserService userService, IJwtTokenService jwtTokenService)
+    public AuthenticateController(
+        IUserService userService, 
+        IJwtTokenService jwtTokenService,
+        ILogger<AuthenticateController> logger)
     {
         _userService = userService;
         _jwtTokenService = jwtTokenService;
+        _logger = logger;
     }
 
-    // ========= LOGIN (único endpoint) =========
+    /// <summary>
+    /// Authenticate user and generate JWT token
+    /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken = default)
     {
-        var (username, role, customerId) = await _userService.LoginAsync(request);
+        _logger.LogInformation("Login attempt for user: {Username}", request.Username);
+
+        var (username, role, customerId) = await _userService.LoginAsync(request, cancellationToken);
 
         var token = _jwtTokenService.GenerateToken(username, role, customerId);
+        
+        _logger.LogInformation("Login successful for user: {Username}, Role: {Role}", username, role);
 
-        return Ok(new
-        {
+        return Ok(new 
+        { 
             token,
+            username,
             role,
             customerId
         });
     }
 
-    // ========= REGISTER (único endpoint) =========
+    /// <summary>
+    /// Register a new user
+    /// </summary>
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken = default)
     {
-        // Aquí delegás TODO al servicio: rol por defecto, creación de AppUser, Customer, etc.
-        var userId = await _userService.RegisterAsync(request);
+        _logger.LogInformation("Registration attempt for user: {Username}, Email: {Email}", request.UserName, request.Email);
+
+        var userId = await _userService.RegisterAsync(request, cancellationToken);
+
+        _logger.LogInformation("User registered successfully with ID: {UserId}", userId);
 
         return Ok(new
         {

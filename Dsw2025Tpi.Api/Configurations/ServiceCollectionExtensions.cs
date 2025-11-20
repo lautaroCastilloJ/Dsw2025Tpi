@@ -3,6 +3,7 @@ using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Identity;
 using Dsw2025Tpi.Data.Persistence;
+using Dsw2025Tpi.Data.Repositories;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,8 +20,8 @@ public static class ServiceCollectionExtensions
             options.UseSqlServer(connectionString));
 
         // ========= Application Services =========
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+        services.AddScoped<IUserService, UserService>();        
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IOrderService, OrderService>();
 
