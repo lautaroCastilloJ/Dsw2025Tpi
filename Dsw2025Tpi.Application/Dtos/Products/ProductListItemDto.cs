@@ -12,3 +12,5 @@ public sealed record ProductListItemDto(
     string Name,
     decimal CurrentUnitPrice,
     bool IsActive);
+
+// Response DTO para listar productos (con menos detalles que ProductResponse)

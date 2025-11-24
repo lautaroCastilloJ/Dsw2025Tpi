@@ -46,13 +46,15 @@ public sealed class ProductService : IProductService
                     value,
                     existing.Id,
                     $"Ya existe un producto con {field} '{value}', pero está deshabilitado. " +
-                    $"Puedes modificar su SKU y/o InternalCode usando el Id {existing.Id}."
+                    $"Su id es: {existing.Id}."
                 );
             }
 
             // Producto activo con mismo SKU / código interno
             throw new ProductAlreadyExistsException(field, value, existing.Id);
         }
+
+
 
         // Si no existe, creamos el producto normalmente
         var product = Product.Create(
@@ -90,11 +92,7 @@ public sealed class ProductService : IProductService
 
         if (totalCount == 0)
         {
-            return PagedResult<ProductResponse>.Create(
-                new List<ProductResponse>(),
-                0,
-                pageNumber,
-                pageSize);
+            throw new NoProductsAvailableException();
         }
 
         // Paginación + proyección a DTO
@@ -152,6 +150,42 @@ public sealed class ProductService : IProductService
         return _mapper.Map<ProductResponse>(product);
     }
 
+    // 4b) Actualizar producto con IsActive → PUT /api/products/{id}
+    public async Task<ProductResponse?> UpdateAsync(Guid productId, ProductUpdateRequest request)
+    {
+        var product = await _productRepository.GetById(productId);
+
+        if (product is null)
+        {
+            throw new ProductNotFoundException(productId);
+        }
+
+        // Validar que no se intente deshabilitar un producto activo
+        if (product.IsActive && !request.IsActive)
+        {
+            throw new ProductCannotBeDisabledException();
+        }
+
+        product.UpdateDetails(
+            request.Sku,
+            request.InternalCode,
+            request.Name,
+            request.Description ?? string.Empty,
+            request.CurrentUnitPrice,
+            request.StockQuantity);
+
+        // Si el producto estaba inactivo y ahora se quiere activar
+        if (!product.IsActive && request.IsActive)
+        {
+            product.Activate();
+        }
+
+        await _productRepository.Update(product);
+
+        return _mapper.Map<ProductResponse>(product);
+    }
+
+
     // 5) Inhabilitar producto → PATCH /api/products/{id}
     public async Task DisableAsync(Guid productId)
     {
@@ -168,9 +202,7 @@ public sealed class ProductService : IProductService
     }
 
     // 6) Paginación de productos → GET /api/products/paged?...
-    public Task<PagedResult<ProductListItemDto>> GetPagedAsync(
-           FilterProductRequest filter,
-           CancellationToken cancellationToken = default)
+    public Task<PagedResult<ProductListItemDto>> GetPagedAsync(FilterProductRequest filter, CancellationToken cancellationToken = default)
     {
         // i) Query base
         var query = _productRepository.GetAllQueryable();
@@ -188,13 +220,14 @@ public sealed class ProductService : IProductService
             };
         }
 
-        // iii) Filtro de búsqueda (SKU / Nombre)
+        // iii) Filtro de búsqueda por SKU, InternalCode y Nombre.
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var term = filter.Search.Trim();
 
             query = query.Where(p =>
                 p.Sku.Contains(term) ||
+                p.InternalCode.Contains(term) ||
                 p.Name.Contains(term));
         }
 
@@ -211,13 +244,7 @@ public sealed class ProductService : IProductService
 
         if (totalCount == 0)
         {
-            var empty = PagedResult<ProductListItemDto>.Create(
-                Array.Empty<ProductListItemDto>(),
-                0,
-                pageNumber,
-                pageSize);
-
-            return Task.FromResult(empty);
+            throw new NoProductsAvailableException();
         }
 
         // vi) Paginación + proyección a DTO liviano

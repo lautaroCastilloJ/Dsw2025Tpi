@@ -46,7 +46,7 @@ public class ProductsController : ControllerBase
     {
         var paged = await _productService.GetAllAsync(pageNumber, pageSize);
 
-        return Ok(paged);  // Siempre retorna 200 con PagedResult, aunque items esté vacío
+        return Ok(paged);  // 200 con PagedResult (lanza excepción si no hay productos)
     }
 
 
@@ -69,7 +69,7 @@ public class ProductsController : ControllerBase
     // 4. Actualizar un producto -> PUT /api/products/{id}
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Administrador")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ProductRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] ProductUpdateRequest request)
     {
         var updated = await _productService.UpdateAsync(id, request);
 
@@ -97,12 +97,12 @@ public class ProductsController : ControllerBase
     //    GET /api/products/admin?status=enabled&search=abc&pageNumber=1&pageSize=10
     [HttpGet("admin")]
     [Authorize(Roles = "Administrador")]
-    public async Task<IActionResult> GetPagedForAdmin(
-        [FromQuery] FilterProductRequest filter,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> GetPagedForAdmin([FromQuery] FilterProductRequest filter, CancellationToken cancellationToken)
     {
         var paged = await _productService.GetPagedAsync(filter, cancellationToken);
 
-        return Ok(paged);  // Siempre retorna 200 con PagedResult, aunque items esté vacío
+        return Ok(paged);  // 200 con PagedResult (lanza excepción si no hay productos)
     }
+
+
 }

@@ -44,8 +44,6 @@ public sealed class Product : EntityBase
 
     public void UpdateDetails(string sku, string internalCode, string name, string description, decimal price, int stock)
     {
-        EnsureActive();
-
         SetSku(sku);
         SetInternalCode(internalCode);
         SetName(name);

@@ -210,4 +210,10 @@
   <data name="ORDERITEM_INVALID_PRODUCT_NAME" xml:space="preserve">
     <value>El nombre del producto es obligatorio para registrar el ítem de la orden.</value>
   </data>
+  <data name="PRODUCT_CANNOT_BE_DISABLED" xml:space="preserve">
+    <value>No se puede deshabilitar un producto activo mediante esta operación. Use el endpoint PATCH /api/products/{id} para deshabilitarlo.</value>
+  </data>
+  <data name="NO_PRODUCTS_AVAILABLE" xml:space="preserve">
+    <value>No hay productos disponibles en este momento.</value>
+  </data>
 </root>
