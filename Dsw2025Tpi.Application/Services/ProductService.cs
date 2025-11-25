@@ -33,30 +33,31 @@ public sealed class ProductService : IProductService
 
         if (existing is not null)
         {
-            var field = existing.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase)
-                ? "SKU"
-                : "InternalCode";
+            // Determinar si el conflicto es por SKU o InternalCode
+            var isSkuConflict = existing.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase);
 
-            var value = field == "SKU" ? request.Sku : request.InternalCode;
-
-            if (!existing.IsActive)
+            if (isSkuConflict)
             {
-                throw new ProductAlreadyExistsException(
-                    field,
-                    value,
-                    existing.Id,
-                    $"Ya existe un producto con {field} '{value}', pero está deshabilitado. " +
-                    $"Su id es: {existing.Id}."
-                );
+                // Conflicto por SKU
+                if (!existing.IsActive)
+                {
+                    throw new ProductSkuAlreadyExistsDisabledException(request.Sku, existing.Id);
+                }
+                throw new ProductSkuAlreadyExistsException(request.Sku, existing.Id);
             }
-
-            // Producto activo con mismo SKU / código interno
-            throw new ProductAlreadyExistsException(field, value, existing.Id);
+            else
+            {
+                // Conflicto por InternalCode
+                if (!existing.IsActive)
+                {
+                    throw new ProductInternalCodeAlreadyExistsDisabledException(request.InternalCode, existing.Id);
+                }
+                throw new ProductInternalCodeAlreadyExistsException(request.InternalCode, existing.Id);
+            }
         }
 
-
-
         // Si no existe, creamos el producto normalmente
+        // Las validaciones de precio, stock, SKU, etc. se lanzan automáticamente desde Product.Create()
         var product = Product.Create(
             request.Sku,
             request.InternalCode,
@@ -127,30 +128,7 @@ public sealed class ProductService : IProductService
         return _mapper.Map<ProductResponse>(product);
     }
 
-    // 4) Actualizar producto → PUT /api/products/{id}
-    public async Task<ProductResponse?> UpdateAsync(Guid productId, ProductRequest request)
-    {
-        var product = await _productRepository.GetById(productId);
-
-        if (product is null)
-        {
-            throw new ProductNotFoundException(productId);
-        }
-
-        product.UpdateDetails(
-            request.Sku,
-            request.InternalCode,
-            request.Name,
-            request.Description ?? string.Empty,
-            request.CurrentUnitPrice,
-            request.StockQuantity);
-
-        await _productRepository.Update(product);
-
-        return _mapper.Map<ProductResponse>(product);
-    }
-
-    // 4b) Actualizar producto con IsActive → PUT /api/products/{id}
+    // 4) Actualizar producto con IsActive → PUT /api/products/{id}
     public async Task<ProductResponse?> UpdateAsync(Guid productId, ProductUpdateRequest request)
     {
         var product = await _productRepository.GetById(productId);
@@ -166,6 +144,7 @@ public sealed class ProductService : IProductService
             throw new ProductCannotBeDisabledException();
         }
 
+        // Las validaciones de precio, stock, SKU, etc. se lanzan automáticamente desde UpdateDetails()
         product.UpdateDetails(
             request.Sku,
             request.InternalCode,
@@ -184,7 +163,6 @@ public sealed class ProductService : IProductService
 
         return _mapper.Map<ProductResponse>(product);
     }
-
 
     // 5) Inhabilitar producto → PATCH /api/products/{id}
     public async Task DisableAsync(Guid productId)

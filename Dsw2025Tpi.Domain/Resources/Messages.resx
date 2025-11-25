@@ -195,9 +195,6 @@
   <data name="PRODUCT_NOT_FOUND" xml:space="preserve">
     <value>El producto solicitado no existe.</value>
   </data>
-  <data name="PRODUCT_ALREADY_EXISTS" xml:space="preserve">
-    <value>Ya existe un producto con {0} '{1}'.</value>
-  </data>
   <data name="ORDER_NOT_FOUND" xml:space="preserve">
     <value>La orden solicitada no existe.</value>
   </data>
@@ -215,5 +212,17 @@
   </data>
   <data name="NO_PRODUCTS_AVAILABLE" xml:space="preserve">
     <value>No hay productos disponibles en este momento.</value>
+  </data>
+  <data name="PRODUCT_SKU_ALREADY_EXISTS" xml:space="preserve">
+    <value>Ya existe un producto activo con ese SKU.</value>
+  </data>
+  <data name="PRODUCT_SKU_ALREADY_EXISTS_DISABLED" xml:space="preserve">
+    <value>Ya existe un producto deshabilitado con ese SKU.</value>
+  </data>
+  <data name="PRODUCT_INTERNAL_CODE_ALREADY_EXISTS" xml:space="preserve">
+    <value>Ya existe un producto activo con ese código interno.</value>
+  </data>
+  <data name="PRODUCT_INTERNAL_CODE_ALREADY_EXISTS_DISABLED" xml:space="preserve">
+    <value>Ya existe un producto deshabilitado con ese código interno.</value>
   </data>
 </root>
