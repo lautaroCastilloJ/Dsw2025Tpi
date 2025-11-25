@@ -14,6 +14,8 @@ public sealed class Order : EntityBase
     public OrderStatus Status { get; private set; }
     public Guid CustomerId { get; private set; } // FK
 
+    // Propiedad de navegación
+    public Customer? Customer { get; private set; }
 
     private readonly List<OrderItem> _items = new();
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();

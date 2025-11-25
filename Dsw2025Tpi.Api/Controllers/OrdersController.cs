@@ -1,4 +1,6 @@
 ﻿using Dsw2025Tpi.Api.Examples;
+using Dsw2025Tpi.Api.Extensions;
+using Dsw2025Tpi.Api.Filters;
 using Dsw2025Tpi.Application.Dtos.Orders;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Data.Identity;
@@ -28,18 +30,12 @@ public class OrdersController : ControllerBase
     // ----------------------------------------------------------------------
     [HttpPost]
     [Authorize(Roles = AppRoles.Cliente)]
+    [ValidateCustomerId]
     [SwaggerRequestExample(typeof(OrderRequest), typeof(OrderRequestExample))]
     public async Task<IActionResult> Create([FromBody] OrderRequest request)
     {
-        // 1) Obtener CustomerId del token
-        var customerIdClaim = User.FindFirst("customerId")?.Value;
+        var customerId = HttpContext.GetCustomerId();
 
-        if (string.IsNullOrWhiteSpace(customerIdClaim))
-            return Forbid(); // token inválido o sin customerId
-
-        var customerId = Guid.Parse(customerIdClaim);
-
-        // 2) Crear la orden con un customerId confiable
         var created = await _orderService.CreateOrderAsync(customerId, request);
 
         return CreatedAtAction(
@@ -66,15 +62,13 @@ public class OrdersController : ControllerBase
     // ----------------------------------------------------------------------
     [HttpGet("my-orders")]
     [Authorize(Roles = AppRoles.Cliente)]
+    [ValidateCustomerId]
     public async Task<ActionResult<IEnumerable<OrderResponse>>> GetMyOrders(
         [FromQuery] string? status,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
-        // Obtener customerId del token
-        var customerIdClaim = User.FindFirst("customerId")?.Value;
-        if (!Guid.TryParse(customerIdClaim, out var customerId) || customerId == Guid.Empty)
-            return Unauthorized(new { error = "No se pudo resolver el cliente desde el token." });
+        var customerId = HttpContext.GetCustomerId();
 
         var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
 

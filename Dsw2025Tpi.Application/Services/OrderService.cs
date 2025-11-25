@@ -120,7 +120,7 @@ public sealed class OrderService : IOrderService
     // ===========================================================
     public async Task<OrderResponse> GetOrderByIdAsync(Guid id)
     {
-        var order = await _orderRepository.GetById(id, "Items"); // Include Items
+        var order = await _orderRepository.GetById(id, "Items,Customer"); // Include Items y Customer
 
         if (order is null)
             throw new OrderNotFoundException(id);
@@ -137,7 +137,7 @@ public sealed class OrderService : IOrderService
         int pageNumber,
         int pageSize)
     {
-        var query = _orderRepository.GetAllQueryable("Items"); // Include Items para calcular TotalAmount
+        var query = _orderRepository.GetAllQueryable("Items,Customer"); // Include Items y Customer
 
         if (!string.IsNullOrWhiteSpace(status))
         {
@@ -172,7 +172,7 @@ public sealed class OrderService : IOrderService
     // ===========================================================
     public async Task<OrderResponse> UpdateOrderStatusAsync(Guid id, string newStatus)
     {
-        var order = await _orderRepository.GetById(id, "Items"); // Include Items para TotalAmount
+        var order = await _orderRepository.GetById(id, "Items,Customer"); // Include Items y Customer
         if (order is null)
             throw new OrderNotFoundException(id);
 
@@ -201,7 +201,7 @@ public sealed class OrderService : IOrderService
         FilterOrder filter,
         CancellationToken cancellationToken = default)
     {
-        var query = _orderRepository.GetAllQueryable("Items"); // Include Items para TotalAmount
+        var query = _orderRepository.GetAllQueryable("Items,Customer"); // Include Items y Customer
 
         // Filtrar por estado
         if (!string.IsNullOrWhiteSpace(filter.Status))

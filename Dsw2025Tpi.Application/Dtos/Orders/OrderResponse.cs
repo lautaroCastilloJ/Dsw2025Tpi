@@ -9,6 +9,7 @@ namespace Dsw2025Tpi.Application.Dtos.Orders;
 public record OrderResponse(
     Guid Id,
     Guid CustomerId,
+    string CustomerName,
     DateTime Date,
     string ShippingAddress,
     string BillingAddress,
