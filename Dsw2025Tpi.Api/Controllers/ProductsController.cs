@@ -81,19 +81,29 @@ public class ProductsController : ControllerBase
 
 
     // ---------------------------------------------------------------------------------------------------------------------
-    // 5. Inhabilitar un producto -> PATCH /api/products/{id}
-    [HttpPatch("{id:guid}")]
+    // 5. Inhabilitar un producto -> PATCH /api/products/{id}/disable
+    [HttpPatch("{id:guid}/disable")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Disable(Guid id)
     {
         await _productService.DisableAsync(id);
-        // Si el servicio lanza ProductNotFoundException, tu middleware la convertirá en 404
         return NoContent();                   // 204 si fue exitoso
     }
 
 
     // ---------------------------------------------------------------------------------------------------------------------
-    // 6. Listado paginado con filtro SOLO para administrador
+    // 6. Habilitar un producto -> PATCH /api/products/{id}/enable
+    [HttpPatch("{id:guid}/enable")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> Enable(Guid id)
+    {
+        await _productService.EnableAsync(id);
+        return NoContent();                   // 204 si fue exitoso
+    }
+
+
+    // ---------------------------------------------------------------------------------------------------------------------
+    // 7. Listado paginado con filtro SOLO para administrador
     //    GET /api/products/admin?status=enabled&search=abc&pageNumber=1&pageSize=10
     [HttpGet("admin")]
     [Authorize(Roles = "Administrador")]

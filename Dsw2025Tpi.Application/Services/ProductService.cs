@@ -128,7 +128,7 @@ public sealed class ProductService : IProductService
         return _mapper.Map<ProductResponse>(product);
     }
 
-    // 4) Actualizar producto con IsActive → PUT /api/products/{id}
+    // 4) Actualizar producto → PUT /api/products/{id}
     public async Task<ProductResponse?> UpdateAsync(Guid productId, ProductUpdateRequest request)
     {
         var product = await _productRepository.GetById(productId);
@@ -136,12 +136,6 @@ public sealed class ProductService : IProductService
         if (product is null)
         {
             throw new ProductNotFoundException(productId);
-        }
-
-        // Validar que no se intente deshabilitar un producto activo
-        if (product.IsActive && !request.IsActive)
-        {
-            throw new ProductCannotBeDisabledException();
         }
 
         // Las validaciones de precio, stock, SKU, etc. se lanzan automáticamente desde UpdateDetails()
@@ -152,12 +146,6 @@ public sealed class ProductService : IProductService
             request.Description ?? string.Empty,
             request.CurrentUnitPrice,
             request.StockQuantity);
-
-        // Si el producto estaba inactivo y ahora se quiere activar
-        if (!product.IsActive && request.IsActive)
-        {
-            product.Activate();
-        }
 
         await _productRepository.Update(product);
 
@@ -179,7 +167,22 @@ public sealed class ProductService : IProductService
         await _productRepository.Update(product);
     }
 
-    // 6) Paginación de productos → GET /api/products/paged?...
+    // 6) Habilitar producto → PATCH /api/products/{id}/enable
+    public async Task EnableAsync(Guid productId)
+    {
+        var product = await _productRepository.GetById(productId);
+
+        if (product is null)
+        {
+            throw new ProductNotFoundException(productId);
+        }
+
+        product.Activate();
+
+        await _productRepository.Update(product);
+    }
+
+    // 7) Paginación de productos → GET /api/products/paged?...
     public Task<PagedResult<ProductListItemDto>> GetPagedAsync(FilterProductRequest filter, CancellationToken cancellationToken = default)
     {
         // i) Query base
