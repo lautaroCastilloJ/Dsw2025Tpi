@@ -179,12 +179,27 @@ public sealed class OrderService : IOrderService
         if (!Enum.TryParse<OrderStatus>(newStatus, true, out var status))
             throw new InvalidOrderStatusException(newStatus);
 
+        // Validar si el estado ya está establecido
+        if (order.Status == status)
+            throw new OrderStatusAlreadySetException(status);
+
         switch (status)
         {
-            case OrderStatus.Processing: order.MarkAsProcessing(); break;
-            case OrderStatus.Shipped: order.MarkAsShipped(); break;
-            case OrderStatus.Delivered: order.MarkAsDelivered(); break;
-            case OrderStatus.Cancelled: order.Cancel(); break;
+            case OrderStatus.Pending:
+                // No se puede volver a Pending desde otro estado
+                throw new InvalidOrderStatusTransitionException(order.Status, status);
+            case OrderStatus.Processing:
+                order.MarkAsProcessing();
+                break;
+            case OrderStatus.Shipped:
+                order.MarkAsShipped();
+                break;
+            case OrderStatus.Delivered:
+                order.MarkAsDelivered();
+                break;
+            case OrderStatus.Cancelled:
+                order.Cancel();
+                break;
             default:
                 throw new InvalidOrderStatusTransitionException(order.Status, status);
         }
