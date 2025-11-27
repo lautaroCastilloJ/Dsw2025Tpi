@@ -138,6 +138,39 @@ public sealed class ProductService : IProductService
             throw new ProductNotFoundException(productId);
         }
 
+        var skuLower = request.Sku.Trim().ToLowerInvariant();
+        var codeLower = request.InternalCode.Trim().ToLowerInvariant();
+
+        // Buscar si existe otro producto (diferente al actual) con el mismo SKU o InternalCode
+        var existing = await _productRepository.First(p =>
+            p.Id != productId &&
+            (p.Sku.ToLower() == skuLower || p.InternalCode.ToLower() == codeLower));
+
+        if (existing is not null)
+        {
+            // Determinar si el conflicto es por SKU o InternalCode
+            var isSkuConflict = existing.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase);
+
+            if (isSkuConflict)
+            {
+                // Conflicto por SKU
+                if (!existing.IsActive)
+                {
+                    throw new ProductSkuAlreadyExistsDisabledException(request.Sku, existing.Id);
+                }
+                throw new ProductSkuAlreadyExistsException(request.Sku, existing.Id);
+            }
+            else
+            {
+                // Conflicto por InternalCode
+                if (!existing.IsActive)
+                {
+                    throw new ProductInternalCodeAlreadyExistsDisabledException(request.InternalCode, existing.Id);
+                }
+                throw new ProductInternalCodeAlreadyExistsException(request.InternalCode, existing.Id);
+            }
+        }
+
         // Las validaciones de precio, stock, SKU, etc. se lanzan automáticamente desde UpdateDetails()
         product.UpdateDetails(
             request.Sku,

@@ -116,9 +116,11 @@ public class Program
 
         // ========= FluentValidation =========
         builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<ProductUpdateRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<OrderItemRequestValidator>();
         builder.Services.AddValidatorsFromAssemblyContaining<UpdateOrderStatusRequestValidator>();
+        builder.Services.AddValidatorsFromAssemblyContaining<FilterOrderValidator>();
 
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddFluentValidationClientsideAdapters();

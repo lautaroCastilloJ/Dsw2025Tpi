@@ -59,37 +59,44 @@ public class OrdersController : ControllerBase
     // ----------------------------------------------------------------------
     // 8. Obtener mis órdenes (Cliente): GET /api/orders/my-orders
     // Solo puede ver sus propias órdenes, customerId viene del token
+    // Búsqueda en: direcciones de envío, facturación y notas
     // ----------------------------------------------------------------------
     [HttpGet("my-orders")]
     [Authorize(Roles = AppRoles.Cliente)]
     [ValidateCustomerId]
-    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetMyOrders(
+    public async Task<IActionResult> GetMyOrders(
         [FromQuery] string? status,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] string? search,
+        [FromQuery] int? pageNumber,
+        [FromQuery] int? pageSize)
     {
         var customerId = HttpContext.GetCustomerId();
 
-        var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
+        var filter = new FilterOrder(
+            Status: status,
+            CustomerId: customerId,
+            CustomerName: null,  // No tiene sentido filtrar por nombre propio
+            Search: search,
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        );
 
-        return Ok(orders);
+        var pagedResult = await _orderService.GetPagedAsync(filter);
+
+        return Ok(pagedResult);
     }
 
     // ----------------------------------------------------------------------
     // 9. Obtener todas las órdenes (Administrador): GET /api/orders/admin
-    // Puede filtrar por customerId, status, con paginación
+    // Puede filtrar por customerId, customerName, status, búsqueda general, con paginación
     // ----------------------------------------------------------------------
     [HttpGet("admin")]
     [Authorize(Roles = AppRoles.Administrador)]
-    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetAll(
-        [FromQuery] string? status,
-        [FromQuery] Guid? customerId,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAllForAdmin([FromQuery] FilterOrder filter)
     {
-        var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
+        var pagedResult = await _orderService.GetPagedAsync(filter);
 
-        return Ok(orders);
+        return Ok(pagedResult);
     }
 
     // ----------------------------------------------------------------------

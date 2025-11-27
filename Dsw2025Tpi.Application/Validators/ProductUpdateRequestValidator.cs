@@ -24,7 +24,10 @@ public class ProductUpdateRequestValidator : AbstractValidator<ProductUpdateRequ
             .MaximumLength(250).When(p => p.Description != null)
             .WithMessage("La descripción no puede exceder 250 caracteres.");
 
-        // Precio y Stock validados por el dominio (Product entity)
-        // Las validaciones de negocio se delegan a la capa de dominio para mantener DDD
+        RuleFor(p => p.CurrentUnitPrice)
+            .GreaterThan(0).WithMessage("El precio debe ser mayor a 0.");
+
+        RuleFor(p => p.StockQuantity)
+            .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
     }
 }
