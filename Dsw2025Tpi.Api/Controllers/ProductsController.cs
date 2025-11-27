@@ -36,15 +36,16 @@ public class ProductsController : ControllerBase
 
     // ---------------------------------------------------------------------------------------------------------------------
     // 2. Obtener todos los productos (activos) con paginación
-    //    GET /api/products?pageNumber=1&pageSize=10
+    //    GET /api/products?pageNumber=1&pageSize=10&search=termo
     //    Público (sin autenticación)
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAll(
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
     {
-        var paged = await _productService.GetAllAsync(pageNumber, pageSize);
+        var paged = await _productService.GetAllAsync(pageNumber, pageSize, search);
 
         return Ok(paged);  // 200 con PagedResult (lanza excepción si no hay productos)
     }

@@ -73,12 +73,22 @@ public sealed class ProductService : IProductService
 
 
     // 2) Obtener todos los productos activos con paginación → GET /api/products
-    public async Task<PagedResult<ProductResponse>> GetAllAsync(int pageNumber = 1, int pageSize = 10)
+    public async Task<PagedResult<ProductResponse>> GetAllAsync(int pageNumber = 1, int pageSize = 10, string? search = null)
     {
         var query = _productRepository.GetAllQueryable();
 
         // Filtrar solo productos activos
         query = query.Where(p => p.IsActive);
+
+        // Filtro de búsqueda por SKU y Nombre
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+
+            query = query.Where(p =>
+                p.Sku.Contains(term) ||
+                p.Name.Contains(term));
+        }
 
         // Normalizar paginación
         if (pageNumber <= 0) pageNumber = 1;
