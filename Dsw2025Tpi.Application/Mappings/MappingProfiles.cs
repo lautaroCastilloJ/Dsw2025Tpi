@@ -25,13 +25,15 @@ public class MappingProfiles : Profile
         // Order with custom mapping
         CreateMap<Order, OrderResponse>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items.ToList()));
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items.ToList()))
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Name : "N/A"));
 
         CreateMap<OrderItem, OrderItemResponse>();
 
         // OrderListItemDto mapping
         CreateMap<Order, OrderListItemDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-            .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount));
+            .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount))
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Name : "N/A"));
     }
 }

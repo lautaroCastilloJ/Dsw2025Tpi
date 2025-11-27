@@ -10,3 +10,5 @@ public record ProductPaginationResponse(
     IEnumerable<ProductResponse> ProductItems,
     int Total
 );
+
+// Response DTO para paginación de productos

@@ -120,7 +120,7 @@ public sealed class OrderService : IOrderService
     // ===========================================================
     public async Task<OrderResponse> GetOrderByIdAsync(Guid id)
     {
-        var order = await _orderRepository.GetById(id, "Items"); // Include Items
+        var order = await _orderRepository.GetById(id, "Items,Customer"); // Include Items y Customer
 
         if (order is null)
             throw new OrderNotFoundException(id);
@@ -129,62 +129,38 @@ public sealed class OrderService : IOrderService
     }
 
     // ===========================================================
-    // 3) LISTAR TODAS LAS ÓRDENES
-    // ===========================================================
-    public async Task<IEnumerable<OrderResponse>> GetAllOrdersAsync(
-        string? status,
-        Guid? customerId,
-        int pageNumber,
-        int pageSize)
-    {
-        var query = _orderRepository.GetAllQueryable("Items"); // Include Items para calcular TotalAmount
-
-        if (!string.IsNullOrWhiteSpace(status))
-        {
-            if (!Enum.TryParse<OrderStatus>(status, true, out var parsedStatus))
-                throw new InvalidOrderStatusException(status);
-
-            query = query.Where(o => o.Status == parsedStatus);
-        }
-
-        if (customerId.HasValue)
-            query = query.Where(o => o.CustomerId == customerId.Value);
-
-        // Normalizar paginación
-        if (pageNumber <= 0) pageNumber = 1;
-        if (pageSize <= 0) pageSize = 10;
-        const int maxSize = 100;
-        if (pageSize > maxSize) pageSize = maxSize;
-
-        // Aplicar paginación
-        query = query
-            .OrderByDescending(o => o.Date)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize);
-
-        var orders = query.ToList();
-
-        return orders.Select(o => _mapper.Map<OrderResponse>(o));
-    }
-
-    // ===========================================================
-    // 4) ACTUALIZAR ESTADO DE ORDEN
+    // 3) ACTUALIZAR ESTADO DE ORDEN
     // ===========================================================
     public async Task<OrderResponse> UpdateOrderStatusAsync(Guid id, string newStatus)
     {
-        var order = await _orderRepository.GetById(id, "Items"); // Include Items para TotalAmount
+        var order = await _orderRepository.GetById(id, "Items,Customer"); // Include Items y Customer
         if (order is null)
             throw new OrderNotFoundException(id);
 
         if (!Enum.TryParse<OrderStatus>(newStatus, true, out var status))
             throw new InvalidOrderStatusException(newStatus);
 
+        // Validar si el estado ya está establecido
+        if (order.Status == status)
+            throw new OrderStatusAlreadySetException(status);
+
         switch (status)
         {
-            case OrderStatus.Processing: order.MarkAsProcessing(); break;
-            case OrderStatus.Shipped: order.MarkAsShipped(); break;
-            case OrderStatus.Delivered: order.MarkAsDelivered(); break;
-            case OrderStatus.Cancelled: order.Cancel(); break;
+            case OrderStatus.Pending:
+                // No se puede volver a Pending desde otro estado
+                throw new InvalidOrderStatusTransitionException(order.Status, status);
+            case OrderStatus.Processing:
+                order.MarkAsProcessing();
+                break;
+            case OrderStatus.Shipped:
+                order.MarkAsShipped();
+                break;
+            case OrderStatus.Delivered:
+                order.MarkAsDelivered();
+                break;
+            case OrderStatus.Cancelled:
+                order.Cancel();
+                break;
             default:
                 throw new InvalidOrderStatusTransitionException(order.Status, status);
         }
@@ -195,13 +171,13 @@ public sealed class OrderService : IOrderService
     }
 
     // ===========================================================
-    // 5) PAGINAR ÓRDENES (para Admin o Cliente)
+    // 4) PAGINAR ÓRDENES (para Admin o Cliente)
     // ===========================================================
     public async Task<PagedResult<OrderListItemDto>> GetPagedAsync(
         FilterOrder filter,
         CancellationToken cancellationToken = default)
     {
-        var query = _orderRepository.GetAllQueryable("Items"); // Include Items para TotalAmount
+        var query = _orderRepository.GetAllQueryable("Items,Customer"); // Include Items y Customer
 
         // Filtrar por estado
         if (!string.IsNullOrWhiteSpace(filter.Status))
@@ -212,20 +188,44 @@ public sealed class OrderService : IOrderService
             query = query.Where(o => o.Status == parsedStatus);
         }
 
-        // Filtrar por Customer
+        // Filtrar por Customer ID
         if (filter.CustomerId.HasValue)
         {
             query = query.Where(o => o.CustomerId == filter.CustomerId.Value);
         }
 
-        // Filtro de búsqueda (opcional)
+        // Filtrar por nombre de cliente (solo para admin, no cuando ya hay customerId)
+        if (!string.IsNullOrWhiteSpace(filter.CustomerName) && !filter.CustomerId.HasValue)
+        {
+            var customerNameLower = filter.CustomerName.Trim().ToLower();
+            query = query.Where(o => o.Customer != null && o.Customer.Name.ToLower().Contains(customerNameLower));
+        }
+
+        // Filtro de búsqueda general
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var searchTerm = filter.Search.ToLower();
-            query = query.Where(o =>
-                   o.ShippingAddress.ToLower().Contains(searchTerm)
-                || o.BillingAddress.ToLower().Contains(searchTerm)
-                || (o.Notes != null && o.Notes.ToLower().Contains(searchTerm)));
+
+            // Si ya estamos filtrando por customerId (caso: cliente viendo sus órdenes)
+            // El cliente puede buscar sus ordenes por id, dirección de envío, dirección de facturación o notas
+            if (filter.CustomerId.HasValue)
+            {
+                query = query.Where(o =>
+                       o.Id.ToString().Contains(searchTerm) 
+                    || o.ShippingAddress.ToLower().Contains(searchTerm)
+                    || o.BillingAddress.ToLower().Contains(searchTerm)
+                    || (o.Notes != null && o.Notes.ToLower().Contains(searchTerm)));
+            }
+            else
+            {
+                // Para admin: buscar también en nombre de cliente
+                query = query.Where(o =>
+                       o.ShippingAddress.ToLower().Contains(searchTerm)
+                    || o.Id.ToString().Contains(searchTerm)
+                    || o.BillingAddress.ToLower().Contains(searchTerm)
+                    || (o.Notes != null && o.Notes.ToLower().Contains(searchTerm))
+                    || (o.Customer != null && o.Customer.Name.ToLower().Contains(searchTerm)));
+            }
         }
 
         // Contar total

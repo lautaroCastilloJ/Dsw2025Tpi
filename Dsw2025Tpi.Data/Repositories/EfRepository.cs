@@ -62,16 +62,23 @@ public class EfRepository<T> : IRepository<T> where T : EntityBase
 
     public IQueryable<T> GetAllQueryable(params string[] include)
     {
-        IQueryable<T> query = _context.Set<T>();
-        foreach (var inc in include)
-            query = query.Include(inc);
-        return query;
+        return Include(_context.Set<T>(), include);
     }
 
     private static IQueryable<T> Include(IQueryable<T> query, string[] includes)
     {
         foreach (var include in includes)
-            query = query.Include(include);
+        {
+            // Soportar múltiples includes separados por coma
+            var includeList = include.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(i => i.Trim())
+                .Where(i => !string.IsNullOrWhiteSpace(i));
+
+            foreach (var inc in includeList)
+            {
+                query = query.Include(inc);
+            }
+        }
         return query;
     }
 }

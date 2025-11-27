@@ -9,10 +9,10 @@ public sealed class OrderStatusAlreadySetException : ExceptionBase
     public OrderStatus Status { get; }
 
     public OrderStatusAlreadySetException(OrderStatus status)
-        : base("ORDER_STATUS_ALREADY_SET", 
-            $"La orden ya se encuentra en el estado '{status}'. No es necesario realizar la transición.")
+        : base("ORDER_STATUS_ALREADY_SET")
     {
         Status = status;
     }
 }
+
 

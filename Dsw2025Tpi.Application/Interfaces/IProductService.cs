@@ -8,10 +8,8 @@ public interface IProductService
     Task<ProductResponse?> GetByIdAsync(Guid id);
     Task<PagedResult<ProductResponse>> GetAllAsync(int pageNumber = 1, int pageSize = 10);
     Task<ProductResponse> CreateAsync(ProductRequest request);
-    Task<ProductResponse?> UpdateAsync(Guid productId, ProductRequest request);
-    Task DisableAsync(Guid productId); // Inhabilitar el producto (soft delete)
-    Task<PagedResult<ProductListItemDto>> GetPagedAsync(
-    FilterProductRequest filter,
-    CancellationToken cancellationToken = default);
-
+    Task<ProductResponse?> UpdateAsync(Guid productId, ProductUpdateRequest request);
+    Task DisableAsync(Guid productId);
+    Task EnableAsync(Guid productId);
+    Task<PagedResult<ProductListItemDto>> GetPagedAsync(FilterProductRequest filter, CancellationToken cancellationToken = default);
 }

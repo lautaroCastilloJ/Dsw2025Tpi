@@ -14,8 +14,7 @@ public sealed class OrderInsufficientStockException : ExceptionBase
         string productName,
         int requestedQuantity,
         int availableQuantity)
-        : base("ORDER_INSUFFICIENT_STOCK",
-            $"Stock insuficiente para el producto '{productName}'. Se solicitan {requestedQuantity} unidades, pero solo hay {availableQuantity} disponibles.")
+        : base("ORDER_INSUFFICIENT_STOCK")
     {
         ProductId = productId;
         ProductName = productName;

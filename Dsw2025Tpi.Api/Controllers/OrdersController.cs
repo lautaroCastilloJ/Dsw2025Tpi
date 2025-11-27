@@ -1,4 +1,6 @@
 ﻿using Dsw2025Tpi.Api.Examples;
+using Dsw2025Tpi.Api.Extensions;
+using Dsw2025Tpi.Api.Filters;
 using Dsw2025Tpi.Application.Dtos.Orders;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Data.Identity;
@@ -28,18 +30,12 @@ public class OrdersController : ControllerBase
     // ----------------------------------------------------------------------
     [HttpPost]
     [Authorize(Roles = AppRoles.Cliente)]
+    [ValidateCustomerId]
     [SwaggerRequestExample(typeof(OrderRequest), typeof(OrderRequestExample))]
     public async Task<IActionResult> Create([FromBody] OrderRequest request)
     {
-        // 1) Obtener CustomerId del token
-        var customerIdClaim = User.FindFirst("customerId")?.Value;
+        var customerId = HttpContext.GetCustomerId();
 
-        if (string.IsNullOrWhiteSpace(customerIdClaim))
-            return Forbid(); // token inválido o sin customerId
-
-        var customerId = Guid.Parse(customerIdClaim);
-
-        // 2) Crear la orden con un customerId confiable
         var created = await _orderService.CreateOrderAsync(customerId, request);
 
         return CreatedAtAction(
@@ -63,39 +59,44 @@ public class OrdersController : ControllerBase
     // ----------------------------------------------------------------------
     // 8. Obtener mis órdenes (Cliente): GET /api/orders/my-orders
     // Solo puede ver sus propias órdenes, customerId viene del token
+    // Búsqueda en: direcciones de envío, facturación y notas
     // ----------------------------------------------------------------------
     [HttpGet("my-orders")]
     [Authorize(Roles = AppRoles.Cliente)]
-    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetMyOrders(
+    [ValidateCustomerId]
+    public async Task<IActionResult> GetMyOrders(
         [FromQuery] string? status,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] string? search,
+        [FromQuery] int? pageNumber,
+        [FromQuery] int? pageSize)
     {
-        // Obtener customerId del token
-        var customerIdClaim = User.FindFirst("customerId")?.Value;
-        if (!Guid.TryParse(customerIdClaim, out var customerId) || customerId == Guid.Empty)
-            return Unauthorized(new { error = "No se pudo resolver el cliente desde el token." });
+        var customerId = HttpContext.GetCustomerId();
 
-        var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
+        var filter = new FilterOrder(
+            Status: status,
+            CustomerId: customerId,
+            CustomerName: null,  // No tiene sentido filtrar por nombre propio
+            Search: search,
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        );
 
-        return Ok(orders);
+        var pagedResult = await _orderService.GetPagedAsync(filter);
+
+        return Ok(pagedResult);
     }
 
     // ----------------------------------------------------------------------
     // 9. Obtener todas las órdenes (Administrador): GET /api/orders/admin
-    // Puede filtrar por customerId, status, con paginación
+    // Puede filtrar por customerId, customerName, status, búsqueda general, con paginación
     // ----------------------------------------------------------------------
     [HttpGet("admin")]
     [Authorize(Roles = AppRoles.Administrador)]
-    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetAll(
-        [FromQuery] string? status,
-        [FromQuery] Guid? customerId,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAllForAdmin([FromQuery] FilterOrder filter)
     {
-        var orders = await _orderService.GetAllOrdersAsync(status, customerId, pageNumber, pageSize);
+        var pagedResult = await _orderService.GetPagedAsync(filter);
 
-        return Ok(orders);
+        return Ok(pagedResult);
     }
 
     // ----------------------------------------------------------------------

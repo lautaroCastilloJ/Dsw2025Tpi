@@ -5,4 +5,5 @@ public sealed record OrderListItemDto(
     DateTime Date,
     string Status,
     Guid CustomerId,
+    string CustomerName,
     decimal TotalAmount);
