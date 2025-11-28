@@ -45,6 +45,22 @@ public class UserService : IUserService
         {
             await _unitOfWork.ExecuteAsync(async () =>
             {
+                // Validar que el email no exista
+                var existingUserByEmail = await _userManager.FindByEmailAsync(request.Email);
+                if (existingUserByEmail != null)
+                {
+                    _logger.LogWarning("Intento de registro con email ya existente: {Email}", request.Email);
+                    throw new EmailAlreadyExistsException(request.Email);
+                }
+
+                // Validar que el username no exista
+                var existingUserByUsername = await _userManager.FindByNameAsync(request.UserName);
+                if (existingUserByUsername != null)
+                {
+                    _logger.LogWarning("Intento de registro con username ya existente: {Username}", request.UserName);
+                    throw new UsernameAlreadyExistsException(request.UserName);
+                }
+
                 // 1. Crear AppUser
                 var user = new AppUser
                 {
