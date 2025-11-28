@@ -138,6 +138,12 @@
   <data name="AUTH_USER_CREATION_FAILED" xml:space="preserve">
     <value>No se pudo crear el usuario. Verifique que el usuario y correo electrónico sean válidos y únicos.</value>
   </data>
+  <data name="AUTH_EMAIL_ALREADY_EXISTS" xml:space="preserve">
+    <value>El correo electrónico ya está registrado. Por favor, use otro correo electrónico o inicie sesión.</value>
+  </data>
+  <data name="AUTH_USERNAME_ALREADY_EXISTS" xml:space="preserve">
+    <value>El nombre de usuario ya está en uso. Por favor, elija otro nombre de usuario.</value>
+  </data>
   <data name="PRODUCT_INVALID_SKU" xml:space="preserve">
     <value>El SKU del producto no es válido. Debe ser un valor no vacío.</value>
   </data>
