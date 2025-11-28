@@ -19,7 +19,8 @@ public class MappingProfiles : Profile
                 src.Name,
                 src.Description ?? string.Empty,
                 src.CurrentUnitPrice,
-                src.StockQuantity
+                src.StockQuantity,
+                src.ImageUrl
             ));
 
         // Order with custom mapping

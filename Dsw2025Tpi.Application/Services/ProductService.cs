@@ -64,7 +64,8 @@ public sealed class ProductService : IProductService
             request.Name,
             request.Description ?? string.Empty,
             request.CurrentUnitPrice,
-            request.StockQuantity);
+            request.StockQuantity,
+            request.ImageUrl);
 
         await _productRepository.Add(product);
 
@@ -188,7 +189,8 @@ public sealed class ProductService : IProductService
             request.Name,
             request.Description ?? string.Empty,
             request.CurrentUnitPrice,
-            request.StockQuantity);
+            request.StockQuantity,
+            request.ImageUrl);
 
         await _productRepository.Update(product);
 
@@ -281,6 +283,7 @@ public sealed class ProductService : IProductService
                 p.Sku,
                 p.Name,
                 p.CurrentUnitPrice,
+                p.ImageUrl,
                 p.IsActive))
             .ToList();
 

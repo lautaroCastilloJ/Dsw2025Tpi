@@ -33,6 +33,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.StockQuantity)
             .IsRequired();
 
+        builder.Property(p => p.ImageUrl)
+            .HasMaxLength(500)
+            .IsRequired(false);
+
         builder.Property(p => p.IsActive)
             .IsRequired();
     }

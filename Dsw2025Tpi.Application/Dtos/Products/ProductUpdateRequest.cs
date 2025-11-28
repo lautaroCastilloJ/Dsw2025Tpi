@@ -6,5 +6,6 @@ public record ProductUpdateRequest(
     string Name,
     string? Description,
     decimal CurrentUnitPrice,
-    int StockQuantity
+    int StockQuantity,
+    string? ImageUrl
 );

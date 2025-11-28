@@ -35,6 +35,22 @@ public class ProductRequestValidator : AbstractValidator<ProductRequest>
         // Stock Validation
         RuleFor(p => p.StockQuantity)
             .GreaterThanOrEqualTo(0).WithMessage("El stock no puede ser negativo.");
+
+        // ImageUrl Validation (Optional field)
+        RuleFor(p => p.ImageUrl)
+            .MaximumLength(500).When(p => !string.IsNullOrWhiteSpace(p.ImageUrl))
+            .WithMessage("La URL de la imagen no puede exceder 500 caracteres.")
+            .Must(BeAValidUrl).When(p => !string.IsNullOrWhiteSpace(p.ImageUrl))
+            .WithMessage("La URL de la imagen debe ser una URL válida.");
+    }
+
+    private bool BeAValidUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return true;
+
+        return Uri.TryCreate(url, UriKind.Absolute, out var uriResult)
+            && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 }
 

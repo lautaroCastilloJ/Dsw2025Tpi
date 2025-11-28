@@ -14,5 +14,6 @@ public record ProductResponse(
     string? Description,
     decimal CurrentUnitPrice,
     int StockQuantity,
+    string? ImageUrl,
     bool IsActive
 );
