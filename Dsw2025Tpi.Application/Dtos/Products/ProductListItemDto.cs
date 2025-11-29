@@ -11,6 +11,7 @@ public sealed record ProductListItemDto(
     string Sku,
     string Name,
     decimal CurrentUnitPrice,
+    string? ImageUrl,
     bool IsActive);
 
 // Response DTO para listar productos (con menos detalles que ProductResponse)

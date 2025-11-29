@@ -10,6 +10,7 @@ public sealed class Product : EntityBase
     public string Description { get; private set; }
     public decimal CurrentUnitPrice { get; private set; }
     public int StockQuantity { get; private set; }
+    public string? ImageUrl { get; private set; }
     public bool IsActive { get; private set; }
 
     private Product() { } // EF Core
@@ -20,7 +21,8 @@ public sealed class Product : EntityBase
         string name,
         string description,
         decimal price,
-        int stock)
+        int stock,
+        string? imageUrl = null)
     {
         SetSku(sku);
         SetInternalCode(internalCode);
@@ -28,6 +30,7 @@ public sealed class Product : EntityBase
         SetDescription(description);
         SetPrice(price);
         SetStock(stock);
+        SetImageUrl(imageUrl);
         IsActive = true;
     }
 
@@ -37,12 +40,13 @@ public sealed class Product : EntityBase
         string name,
         string description,
         decimal price,
-        int stock)
-        => new Product(sku, internalCode, name, description, price, stock);
+        int stock,
+        string? imageUrl = null)
+        => new Product(sku, internalCode, name, description, price, stock, imageUrl);
 
     // --------- Update method ---------
 
-    public void UpdateDetails(string sku, string internalCode, string name, string description, decimal price, int stock)
+    public void UpdateDetails(string sku, string internalCode, string name, string description, decimal price, int stock, string? imageUrl = null)
     {
         SetSku(sku);
         SetInternalCode(internalCode);
@@ -50,6 +54,7 @@ public sealed class Product : EntityBase
         SetDescription(description);
         SetPrice(price);
         SetStock(stock);
+        SetImageUrl(imageUrl);
     }
 
     // --------- ---------
@@ -153,5 +158,8 @@ public sealed class Product : EntityBase
 
         StockQuantity = stock;
     }
+
+    private void SetImageUrl(string? imageUrl)
+        => ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
 }
 
