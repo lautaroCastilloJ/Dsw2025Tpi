@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Dsw2025Tpi.Api.Filters;
 
-/// <summary>
-/// Action Filter que valida y extrae el customerId del token JWT.
-/// El customerId validado se almacena en HttpContext.Items para acceso posterior.
-/// </summary>
+
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
 public sealed class ValidateCustomerIdAttribute : ActionFilterAttribute
 {

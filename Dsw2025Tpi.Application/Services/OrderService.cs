@@ -179,6 +179,12 @@ public sealed class OrderService : IOrderService
     {
         var query = _orderRepository.GetAllQueryable("Items,Customer"); // Include Items y Customer
 
+        // Filtrar por OrderId específico (búsqueda exacta)
+        if (filter.OrderId.HasValue)
+        {
+            query = query.Where(o => o.Id == filter.OrderId.Value);
+        }
+
         // Filtrar por estado
         if (!string.IsNullOrWhiteSpace(filter.Status))
         {
@@ -188,44 +194,31 @@ public sealed class OrderService : IOrderService
             query = query.Where(o => o.Status == parsedStatus);
         }
 
-        // Filtrar por Customer ID
+        // Filtrar por Customer ID (búsqueda exacta)
         if (filter.CustomerId.HasValue)
         {
             query = query.Where(o => o.CustomerId == filter.CustomerId.Value);
         }
 
-        // Filtrar por nombre de cliente (solo para admin, no cuando ya hay customerId)
-        if (!string.IsNullOrWhiteSpace(filter.CustomerName) && !filter.CustomerId.HasValue)
+        // Filtrar por nombre de cliente (búsqueda parcial)
+        if (!string.IsNullOrWhiteSpace(filter.CustomerName))
         {
             var customerNameLower = filter.CustomerName.Trim().ToLower();
             query = query.Where(o => o.Customer != null && o.Customer.Name.ToLower().Contains(customerNameLower));
         }
 
-        // Filtro de búsqueda general
-        if (!string.IsNullOrWhiteSpace(filter.Search))
+        // Filtro de búsqueda general (solo si no hay filtros específicos más restrictivos)
+        if (!string.IsNullOrWhiteSpace(filter.Search) && !filter.OrderId.HasValue)
         {
             var searchTerm = filter.Search.ToLower();
 
-            // Si ya estamos filtrando por customerId (caso: cliente viendo sus órdenes)
-            // El cliente puede buscar sus ordenes por id, dirección de envío, dirección de facturación o notas
-            if (filter.CustomerId.HasValue)
-            {
-                query = query.Where(o =>
-                       o.Id.ToString().Contains(searchTerm) 
-                    || o.ShippingAddress.ToLower().Contains(searchTerm)
-                    || o.BillingAddress.ToLower().Contains(searchTerm)
-                    || (o.Notes != null && o.Notes.ToLower().Contains(searchTerm)));
-            }
-            else
-            {
-                // Para admin: buscar también en nombre de cliente
-                query = query.Where(o =>
-                       o.ShippingAddress.ToLower().Contains(searchTerm)
-                    || o.Id.ToString().Contains(searchTerm)
-                    || o.BillingAddress.ToLower().Contains(searchTerm)
-                    || (o.Notes != null && o.Notes.ToLower().Contains(searchTerm))
-                    || (o.Customer != null && o.Customer.Name.ToLower().Contains(searchTerm)));
-            }
+            // Búsqueda general en múltiples campos
+            query = query.Where(o =>
+                   o.Id.ToString().Contains(searchTerm) 
+                || o.ShippingAddress.ToLower().Contains(searchTerm)
+                || o.BillingAddress.ToLower().Contains(searchTerm)
+                || (o.Notes != null && o.Notes.ToLower().Contains(searchTerm))
+                || (o.Customer != null && o.Customer.Name.ToLower().Contains(searchTerm)));
         }
 
         // Contar total

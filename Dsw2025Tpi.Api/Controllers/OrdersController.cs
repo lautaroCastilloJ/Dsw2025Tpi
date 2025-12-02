@@ -65,6 +65,7 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = AppRoles.Cliente)]
     [ValidateCustomerId]
     public async Task<IActionResult> GetMyOrders(
+        [FromQuery] Guid? orderId,
         [FromQuery] string? status,
         [FromQuery] string? search,
         [FromQuery] int? pageNumber,
@@ -73,6 +74,7 @@ public class OrdersController : ControllerBase
         var customerId = HttpContext.GetCustomerId();
 
         var filter = new FilterOrder(
+            OrderId: orderId,
             Status: status,
             CustomerId: customerId,
             CustomerName: null,  // No tiene sentido filtrar por nombre propio
