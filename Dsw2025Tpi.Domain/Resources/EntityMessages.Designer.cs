@@ -22,14 +22,14 @@ namespace Dsw2025Tpi.Domain.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Messages {
+    internal class EntityMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Messages() {
+        internal EntityMessages() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Dsw2025Tpi.Domain.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Dsw2025Tpi.Domain.Resources.Messages", typeof(Messages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Dsw2025Tpi.Domain.Resources.EntityMessages", typeof(EntityMessages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,6 +61,15 @@ namespace Dsw2025Tpi.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to El correo electrónico ya está registrado. Por favor, use otro correo electrónico o inicie sesión..
+        /// </summary>
+        internal static string AUTH_EMAIL_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("AUTH_EMAIL_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Las credenciales ingresadas son inválidas. Verifique su usuario y contraseña..
         /// </summary>
         internal static string AUTH_INVALID_CREDENTIALS {
@@ -75,6 +84,15 @@ namespace Dsw2025Tpi.Domain.Resources {
         internal static string AUTH_USER_CREATION_FAILED {
             get {
                 return ResourceManager.GetString("AUTH_USER_CREATION_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to El nombre de usuario ya está en uso. Por favor, elija otro nombre de usuario..
+        /// </summary>
+        internal static string AUTH_USERNAME_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("AUTH_USERNAME_ALREADY_EXISTS", resourceCulture);
             }
         }
         
@@ -120,6 +138,15 @@ namespace Dsw2025Tpi.Domain.Resources {
         internal static string CUSTOMER_INVALID_PHONE {
             get {
                 return ResourceManager.GetString("CUSTOMER_INVALID_PHONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No hay productos disponibles en este momento..
+        /// </summary>
+        internal static string NO_PRODUCTS_AVAILABLE {
+            get {
+                return ResourceManager.GetString("NO_PRODUCTS_AVAILABLE", resourceCulture);
             }
         }
         
@@ -250,11 +277,11 @@ namespace Dsw2025Tpi.Domain.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ya existe un producto con {0} &apos;{1}&apos;..
+        ///   Looks up a localized string similar to No se puede deshabilitar un producto activo mediante esta operación. Use el endpoint PATCH /api/products/{id} para deshabilitarlo..
         /// </summary>
-        internal static string PRODUCT_ALREADY_EXISTS {
+        internal static string PRODUCT_CANNOT_BE_DISABLED {
             get {
-                return ResourceManager.GetString("PRODUCT_ALREADY_EXISTS", resourceCulture);
+                return ResourceManager.GetString("PRODUCT_CANNOT_BE_DISABLED", resourceCulture);
             }
         }
         
@@ -273,6 +300,24 @@ namespace Dsw2025Tpi.Domain.Resources {
         internal static string PRODUCT_INSUFFICIENT_STOCK {
             get {
                 return ResourceManager.GetString("PRODUCT_INSUFFICIENT_STOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ya existe un producto activo con ese código interno..
+        /// </summary>
+        internal static string PRODUCT_INTERNAL_CODE_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("PRODUCT_INTERNAL_CODE_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ya existe un producto deshabilitado con ese código interno..
+        /// </summary>
+        internal static string PRODUCT_INTERNAL_CODE_ALREADY_EXISTS_DISABLED {
+            get {
+                return ResourceManager.GetString("PRODUCT_INTERNAL_CODE_ALREADY_EXISTS_DISABLED", resourceCulture);
             }
         }
         
@@ -336,6 +381,24 @@ namespace Dsw2025Tpi.Domain.Resources {
         internal static string PRODUCT_NOT_FOUND {
             get {
                 return ResourceManager.GetString("PRODUCT_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ya existe un producto activo con ese SKU..
+        /// </summary>
+        internal static string PRODUCT_SKU_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("PRODUCT_SKU_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ya existe un producto deshabilitado con ese SKU..
+        /// </summary>
+        internal static string PRODUCT_SKU_ALREADY_EXISTS_DISABLED {
+            get {
+                return ResourceManager.GetString("PRODUCT_SKU_ALREADY_EXISTS_DISABLED", resourceCulture);
             }
         }
     }

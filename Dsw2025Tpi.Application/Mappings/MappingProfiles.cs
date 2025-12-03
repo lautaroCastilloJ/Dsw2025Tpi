@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Dsw2025Tpi.Application.Dtos.Orders;
 using Dsw2025Tpi.Application.Dtos.Products;
+using Dsw2025Tpi.Application.Dtos.Payments;
 using Dsw2025Tpi.Domain.Entities;
 
 namespace Dsw2025Tpi.Application.Mappings;
@@ -36,5 +37,8 @@ public class MappingProfiles : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
             .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount))
             .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Name : "N/A"));
+
+        // Payment mappings
+        CreateMap<Payment, PaymentDetailResponse>();
     }
 }
