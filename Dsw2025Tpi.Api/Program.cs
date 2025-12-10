@@ -138,10 +138,14 @@ public class Program
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("PermitirFrontend", policy =>
-                policy.WithOrigins("http://localhost:5173")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .AllowCredentials());
+                        policy
+                             .WithOrigins(
+                                 "http://localhost:5173",
+                                 "https://taken-multimedia-visual-consciousness.trycloudflare.com" // si querés probar llamadas directas desde ahí
+                             )
+                             .AllowAnyHeader()
+                             .AllowAnyMethod()
+                             .AllowCredentials());
         });
 
         var app = builder.Build();
